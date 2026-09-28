@@ -1,0 +1,14 @@
+import { ok, routeError } from "@/lib/api";
+import { marketDataService } from "@/lib/market-data/service";
+
+export const dynamic = "force-dynamic";
+
+/** GET /api/market/indices */
+export async function GET() {
+  try {
+    const served = await marketDataService.getIndices();
+    return ok({ indices: served.data, source: served.source });
+  } catch (err) {
+    return routeError(err);
+  }
+}
