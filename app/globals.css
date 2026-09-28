@@ -1,0 +1,237 @@
+/* ============================================================================
+   FinSight design system — global styles & design tokens
+   Dark, premium, minimal financial-terminal aesthetic.
+   Tokens follow the master spec: near-black backgrounds, subtle borders,
+   one controlled accent (warm gold), clear positive/negative states.
+   ========================================================================== */
+@import "tailwindcss";
+
+@theme {
+  /* --- Surfaces ---------------------------------------------------------- */
+  --color-background: #0a0a0a; /* page background */
+  --color-surface: #111111; /* secondary background / sidebar */
+  --color-card: #151515; /* cards & panels */
+  --color-elevated: #1b1b1b; /* hover / raised rows */
+  --color-overlay: #171717; /* dropdowns, modals */
+  --color-border: #242424; /* subtle borders */
+  --color-border-strong: #303030; /* emphasized borders */
+
+  /* --- Text -------------------------------------------------------------- */
+  --color-foreground: #f5f5f5; /* primary text */
+  --color-secondary: #a1a1aa; /* secondary text */
+  --color-muted: #71717a; /* muted text */
+  --color-faint: #52525b; /* metadata / disabled */
+
+  /* --- Financial semantics ----------------------------------------------- */
+  --color-positive: #4ade80; /* gains */
+  --color-positive-dim: #22c55e;
+  --color-negative: #f87171; /* losses */
+  --color-negative-dim: #ef4444;
+  --color-neutral: #a1a1aa; /* unchanged */
+
+  /* --- Accent (single controlled accent) ---------------------------------- */
+  --color-accent: #e6b04c;
+  --color-accent-strong: #f2c166;
+  --color-accent-foreground: #0a0a0a;
+  --color-accent-soft: rgba(230, 176, 76, 0.12);
+  --color-accent-border: rgba(230, 176, 76, 0.35);
+
+  /* --- Typography -------------------------------------------------------- */
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono:
+    var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --text-2xs: 0.6875rem; /* 11px — dense labels, table meta */
+  --text-xs: 0.75rem; /* 12px — metadata */
+  --text-sm: 0.8125rem; /* 13px — dense body / table cells */
+  --text-base: 0.875rem; /* 14px — default body */
+  --text-lg: 1rem; /* 16px — section headings */
+  --text-xl: 1.125rem; /* 18px — card titles */
+  --text-2xl: 1.375rem; /* 22px — page titles */
+  --text-3xl: 1.75rem; /* 28px — display metrics */
+  --text-4xl: 2.25rem; /* 36px — hero metrics */
+
+  /* --- Radii / shadows (restrained) --------------------------------------- */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+
+  --shadow-overlay: 0 16px 48px rgba(0, 0, 0, 0.6);
+  --shadow-pop: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ============================================================================
+   Base
+   ========================================================================== */
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background-color: var(--color-background);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-accent-soft);
+  color: var(--color-foreground);
+}
+
+:focus-visible {
+  outline: 1px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+/* Subtle scrollbars — visible but not distracting */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2b2b2b transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: #2b2b2b;
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 6px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+  background-clip: content-box;
+}
+
+/* ============================================================================
+   Utilities
+   ========================================================================== */
+
+/* Financial numerals: aligned columns everywhere */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Mono for tickers, symbols, code-like values */
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Scroll container that fades edges (tables on small screens) */
+.fade-x {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 12px,
+    #000 calc(100% - 12px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 12px,
+    #000 calc(100% - 12px),
+    transparent 100%
+  );
+}
+
+/* ============================================================================
+   Animation (restrained — spec allows subtle transitions only)
+   ========================================================================== */
+@keyframes fs-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fs-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fs-shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+@keyframes fs-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes fs-draw {
+  from {
+    stroke-dashoffset: var(--fs-dash, 1000);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.fs-fade-in {
+  animation: fs-fade-in 140ms ease-out both;
+}
+.fs-slide-up {
+  animation: fs-slide-up 160ms ease-out both;
+}
+
+/* Skeleton shimmer — low contrast, no glow */
+.fs-skeleton {
+  background: linear-gradient(
+    90deg,
+    #161616 0%,
+    #1d1d1d 40%,
+    #161616 80%
+  );
+  background-size: 400px 100%;
+  animation: fs-shimmer 1.4s linear infinite;
+}
+
+.fs-spinner {
+  animation: fs-spin 0.7s linear infinite;
+}
+
+/* Chart line draw-in on mount */
+.fs-draw {
+  stroke-dasharray: var(--fs-dash, 1000);
+  animation: fs-draw 700ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
