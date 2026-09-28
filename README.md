@@ -43,8 +43,7 @@ Zero-key mode works out of the box: every payload served is labeled demo data.
 
 ```bash
 # optional — bring your own keys (BYOK)
-cp env.example .env.local     # then fill in only the keys you use
-# (rename the template to `.env.example` first if you prefer the conventional name)
+cp .env.example .env.local  # then fill in only the keys you use
 ```
 
 Keys can also be added later at **Settings → Providers** — they are stored server-side in
@@ -133,7 +132,7 @@ finsight/
 │   └── nav.ts format.ts api.ts utils.ts
 ├── providers/                   # adapters: mock/, gemini/, aimlapi/, bazaarlink/,
 │                                # alphavantage/, finnhub/, newsapi/, rss/
-├── env.example                  # template (rename to .env.example if preferred)
+├── .env.example                 # environment variable template
 ├── .gitignore  README.md  LICENSE
 ```
 
