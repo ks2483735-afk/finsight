@@ -1,0 +1,15 @@
+{
+  "title": "FinSight",
+  "description": "Open-source AI financial research terminal with real-time market data, news intelligence, and multi-provider AI.",
+  "links": [
+    {
+      "title": "FinSight",
+      "links": [
+        {
+          "title": "GitHub",
+          "value": "https://github.com/ks2483735-afk/finsight"
+        }
+      ]
+    }
+  ]
+}
