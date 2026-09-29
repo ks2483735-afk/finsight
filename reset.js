@@ -1,15 +1,15 @@
 module.exports = {
   run: [
     {
-      method: "shell.run",
+      method: "fs.rm",
       params: {
-        message: "if exist node_modules rmdir /s /q node_modules"
+        path: "node_modules"
       }
     },
     {
-      method: "shell.run",
+      method: "fs.rm",
       params: {
-        message: "if exist .next rmdir /s /q .next"
+        path: ".next"
       }
     }
   ]
