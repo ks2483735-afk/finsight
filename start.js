@@ -5,7 +5,7 @@ module.exports = {
       method: "shell.run",
       params: {
         env: {},
-        message: "npm run dev -- --hostname 127.0.0.1 --port {{port}}",
+        message: "npx next dev --hostname 127.0.0.1 --port {{port}}",
         on: [{
           event: "/(http:\\/\\/[0-9.:]+)/",
           done: true
