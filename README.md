@@ -30,6 +30,12 @@ interpretation are always kept clearly separate.
 | AI answers / citations | ⏳ v0.3 (router is honest today: "not configured") |
 | Alert evaluation & notifications | ⏳ v0.7 |
 
+## Pinokio
+
+FinSight includes a Pinokio launcher for one-click local installation and startup. Pinokio can install the Node dependencies, launch the local Next.js server, open the Web UI, update dependencies, and reset generated build artifacts. The launcher does not include or request any API keys; FinSight remains BYOK.
+
+After cloning the repository into Pinokio, use **Install** and then **Start**. Pinokio apps can also be installed directly from a public GitHub repository URL; verified apps are separately listed in Pinokio's Discover catalog.
+
 ## Quickstart
 
 ```bash
