@@ -66,10 +66,12 @@ export const marketDataService = {
     );
   },
 
-  getAllQuotes(): Promise<Served<Quote[]>> {
-    return cached("mq:all", CACHE_TTL.price, () =>
-      resolveMarket((adapter) => adapter.getAllQuotes()),
-    );
+  async getAllQuotes(): Promise<Served<Quote[]>> {
+    return cached("mq:all", CACHE_TTL.price, async () => {
+      const live = await getLiveUniverseQuotes();
+      if (live) return live;
+      return resolveMarket((adapter) => adapter.getAllQuotes());
+    });
   },
 
   getIndices(): Promise<Served<Quote[]>> {
