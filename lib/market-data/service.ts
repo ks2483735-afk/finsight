@@ -13,7 +13,7 @@
 import { initializeProviders } from "@/providers";
 import { getRegistry } from "@/lib/providers/registry";
 import { cached, CACHE_TTL } from "@/lib/cache/ttl";
-import type { MarketDataProvider, Company, Movers, Quote, QuoteBatch } from "@/lib/market-data/types";
+import type { HistoryRange, MarketDataProvider, Company, Movers, PricePoint, Quote, QuoteBatch } from "@/lib/market-data/types";
 import type { DataSourceInfo } from "@/lib/providers/types";
 
 export interface Served<T> {
@@ -84,6 +84,28 @@ export const marketDataService = {
     return cached("mcompanies", CACHE_TTL.fundamentals, () =>
       resolveMarket((adapter) => adapter.getCompanies()),
     );
+  },
+
+
+  async getHistory(symbol: string, range: HistoryRange): Promise<Served<PricePoint[]>> {
+    initializeProviders();
+    const registry = getRegistry();
+    const normalized = symbol.trim().toUpperCase();
+    for (const adapter of registry.listMarketAdapters()) {
+      if (!adapter.getHistory) continue;
+      try {
+        const data = await adapter.getHistory(normalized, range);
+        if (data.length > 1) {
+          return {
+            data,
+            source: { providerId: adapter.id, label: adapter.label, isMock: false, degraded: false },
+          };
+        }
+      } catch {
+        // Try the next live provider.
+      }
+    }
+    throw new Error(`No live price history is available for ${normalized}.`);
   },
 
   async getMovers(limit = 5): Promise<Served<Movers>> {
