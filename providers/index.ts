@@ -15,7 +15,9 @@ import { geminiDescriptor } from "./gemini";
 import { aimlapiDescriptor } from "./aimlapi";
 import { bazaarlinkDescriptor } from "./bazaarlink";
 import { alphaVantageDescriptor } from "./alphavantage";
+import { alphaVantageProvider } from "./alphavantage/adapter";
 import { finnhubDescriptor } from "./finnhub";
+import { finnhubProvider } from "./finnhub/adapter";
 import { newsApiDescriptor } from "./newsapi";
 import { rssDescriptor } from "./rss";
 import { mockMarketProvider } from "./mock/market-data";
@@ -49,8 +51,8 @@ export function initializeProviders(): void {
     market: mockMarketProvider,
     news: mockNewsProvider,
   });
-  // Live adapters register here as they are implemented (v0.2+):
-  //   registry.registerMarketAdapter(alphaVantageProvider);
-  //   registry.registerNewsAdapter(newsApiProvider);
+  // v0.2 live market adapters.
+  registry.registerMarketAdapter(finnhubProvider);
+  registry.registerMarketAdapter(alphaVantageProvider);
   globalRef.__finsightProvidersReady = true;
 }
