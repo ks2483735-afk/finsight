@@ -1,5 +1,5 @@
 import { getSecret } from "@/lib/database/repos/settings";
-import type { Company, MarketDataProvider, Quote, QuoteBatch } from "@/lib/market-data/types";
+import type { Company, HistoryRange, MarketDataProvider, PricePoint, Quote, QuoteBatch } from "@/lib/market-data/types";
 import { envKey } from "@/lib/providers/config";
 
 const BASE_URL = "https://finnhub.io/api/v1";
@@ -53,6 +53,35 @@ function normalize(symbol: string, quote: FinnhubQuote): Quote {
     source: "finnhub",
     isMock: false,
   };
+}
+
+
+async function history(symbol: string, range: HistoryRange): Promise<PricePoint[]> {
+  const now = Math.floor(Date.now() / 1000);
+  const spans: Record<HistoryRange, { seconds: number; resolution: string }> = {
+    "1D": { seconds: 24 * 60 * 60, resolution: "5" },
+    "1W": { seconds: 7 * 24 * 60 * 60, resolution: "30" },
+    "1M": { seconds: 30 * 24 * 60 * 60, resolution: "60" },
+    "1Y": { seconds: 365 * 24 * 60 * 60, resolution: "D" },
+  };
+  const span = spans[range];
+  const url = new URL("https://finnhub.io/api/v1/stock/candle");
+  url.searchParams.set("symbol", symbol);
+  url.searchParams.set("resolution", span.resolution);
+  url.searchParams.set("from", String(now - span.seconds));
+  url.searchParams.set("to", String(now));
+  url.searchParams.set("token", apiKey());
+
+  const response = await fetch(url, { cache: "no-store" });
+  if (!response.ok) throw new Error(`Finnhub HTTP ${response.status}`);
+  const json = (await response.json()) as { s?: string; t?: number[]; c?: number[] };
+  if (json.s !== "ok" || !json.t?.length || !json.c?.length) {
+    throw new Error(`Finnhub returned no history for ${symbol}`);
+  }
+  return json.t.map((time, i) => ({
+    timestamp: new Date(time * 1000).toISOString(),
+    price: json.c![i],
+  })).filter((point) => Number.isFinite(point.price));
 }
 
 export const finnhubProvider: MarketDataProvider = {
