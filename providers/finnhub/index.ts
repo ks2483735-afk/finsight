@@ -8,7 +8,7 @@ export const finnhubDescriptor: ProviderDescriptor = {
   envVar: "FINNHUB_API_KEY",
   docsUrl: "https://finnhub.io/docs/api",
   keyUrl: "https://finnhub.io/register",
-  adapterImplemented: false,
+  adapterImplemented: true,
   plannedIn: "v0.2",
   description:
     "Real-time and historical quotes, company fundamentals, and filings.",
