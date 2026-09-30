@@ -124,5 +124,19 @@ export async function buildTestResult(id: string): Promise<TestResult | null> {
     };
   }
 
-  return { ok: true, requestSent: false, message: "Key present." };
+  try {
+    const message =
+      descriptor.id === "alphavantage"
+        ? await testAlphaVantageConnection()
+        : descriptor.id === "finnhub"
+          ? await testFinnhubConnection()
+          : "Key present.";
+    return { ok: true, requestSent: true, message };
+  } catch (error) {
+    return {
+      ok: false,
+      requestSent: true,
+      message: error instanceof Error ? error.message : "Connection test failed.",
+    };
+  }
 }
