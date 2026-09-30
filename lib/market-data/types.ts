@@ -57,7 +57,7 @@ export interface Movers {
   losers: Quote[];
 }
 
-export interface QuoteBatch {
+export interface PricePoint {\n  timestamp: string;\n  price: number;\n}\n\nexport type HistoryRange = "1D" | "1W" | "1M" | "1Y";\n\nexport interface QuoteBatch {
   quotes: Quote[];
   missing: string[];
 }
