@@ -93,14 +93,15 @@ async function history(symbol: string, _range: HistoryRange): Promise<PricePoint
   }
   const series = json["Time Series (Daily)"] as Record<string, Record<string, string>> | undefined;
   if (!series) throw new Error(`Alpha Vantage returned no history for ${symbol}`);
-  return Object.entries(series)
+  const points = Object.entries(series)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, values]) => ({
       timestamp: new Date(`${date}T00:00:00Z`).toISOString(),
       price: Number(values["4. close"]),
     }))
-    .filter((point) => Number.isFinite(point.price))
-    .slice(-100);
+    .filter((point) => Number.isFinite(point.price));
+  const count = _range === "1D" ? 2 : _range === "1W" ? 5 : _range === "1M" ? 22 : 100;
+  return points.slice(-count);
 }
 
 export const alphaVantageProvider: MarketDataProvider = {
