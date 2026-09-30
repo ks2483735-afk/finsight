@@ -10,6 +10,8 @@ import { envKey, getKeyStatus, isProviderEnabled } from "@/lib/providers/config"
 import { getSecret } from "@/lib/database/repos/settings";
 import { getRegistry } from "@/lib/providers/registry";
 import { initializeProviders } from "@/providers";
+import { testAlphaVantageConnection } from "@/providers/alphavantage/test";
+import { testFinnhubConnection } from "@/providers/finnhub/test";
 
 export interface TestResult {
   ok: boolean;
@@ -63,7 +65,21 @@ async function liveTest(id: string, key: string): Promise<TestResult> {
       : { ok: false, requestSent: true, message: "Alpha Vantage responded, but no usable quote was returned." };
   }
 
-  return { ok: true, requestSent: false, message: "Key present." };
+  try {
+    const message =
+      descriptor.id === "alphavantage"
+        ? await testAlphaVantageConnection()
+        : descriptor.id === "finnhub"
+          ? await testFinnhubConnection()
+          : "Key present.";
+    return { ok: true, requestSent: true, message };
+  } catch (error) {
+    return {
+      ok: false,
+      requestSent: true,
+      message: error instanceof Error ? error.message : "Connection test failed.",
+    };
+  }
 }
 
 export async function buildTestResult(id: string): Promise<TestResult | null> {
