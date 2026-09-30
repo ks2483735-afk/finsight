@@ -1,5 +1,5 @@
 import { getSecret } from "@/lib/database/repos/settings";
-import type { Company, MarketDataProvider, Quote, QuoteBatch } from "@/lib/market-data/types";
+import type { Company, HistoryRange, MarketDataProvider, PricePoint, Quote, QuoteBatch } from "@/lib/market-data/types";
 import { envKey } from "@/lib/providers/config";
 
 const BASE_URL = "https://www.alphavantage.co/query";
@@ -75,6 +75,32 @@ function normalize(input: string, quote: AlphaQuote): Quote {
     source: "alphavantage",
     isMock: false,
   };
+}
+
+
+async function history(symbol: string, _range: HistoryRange): Promise<PricePoint[]> {
+  const url = new URL(BASE_URL);
+  url.searchParams.set("function", "TIME_SERIES_DAILY");
+  url.searchParams.set("symbol", alphaSymbol(symbol.toUpperCase()));
+  url.searchParams.set("outputsize", "compact");
+  url.searchParams.set("apikey", apiKey());
+
+  const response = await fetch(url, { cache: "no-store" });
+  if (!response.ok) throw new Error(`Alpha Vantage HTTP ${response.status}`);
+  const json = (await response.json()) as Record<string, unknown>;
+  if (json["Error Message"] || json.Note || json.Information) {
+    throw new Error(String(json["Error Message"] || json.Note || json.Information));
+  }
+  const series = json["Time Series (Daily)"] as Record<string, Record<string, string>> | undefined;
+  if (!series) throw new Error(`Alpha Vantage returned no history for ${symbol}`);
+  return Object.entries(series)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, values]) => ({
+      timestamp: new Date(`${date}T00:00:00Z`).toISOString(),
+      price: Number(values["4. close"]),
+    }))
+    .filter((point) => Number.isFinite(point.price))
+    .slice(-100);
 }
 
 export const alphaVantageProvider: MarketDataProvider = {
