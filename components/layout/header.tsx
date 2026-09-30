@@ -9,12 +9,15 @@ import { NAV_GROUPS } from "@/lib/nav";
 import { fetchJson } from "@/lib/hooks/use-async-data";
 import { GlobalSearch } from "@/components/layout/global-search";
 import { MobileMenuButton, LogoMark } from "@/components/layout/sidebar";
-import { MockBadge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Tooltip } from "@/components/ui/tooltip";
 
 interface StatusPayload {
   database: { ok: boolean };
   providers: Array<{ configured: boolean }>;
+  mode: "demo" | "mixed" | "live";
+  liveMarketData: boolean;
+  liveNews: boolean;
 }
 
 /** Sticky top header: context, global search, demo + system status. */
@@ -61,7 +64,12 @@ export function Header() {
         <GlobalSearch className="mx-auto hidden w-full max-w-xl md:block" />
 
         <div className="ml-auto flex items-center gap-2 md:ml-0">
-          <MockBadge className="hidden sm:inline-flex" />
+          <Badge
+            variant={status?.mode === "live" ? "positive" : status?.mode === "mixed" ? "accent" : "neutral"}
+            className="hidden uppercase tracking-wider sm:inline-flex"
+          >
+            {status?.mode === "live" ? "Live" : status?.mode === "mixed" ? "Mixed" : "Demo"}
+          </Badge>
 
           <Tooltip label={
             dbOk === null
