@@ -185,7 +185,7 @@ function CompanyDetail({ company }: { company: Company }) {
 
 
 
-export default function CompaniesPage() {
+function CompaniesPageContent() {
   const params = useSearchParams();
   const symbol = params.get("symbol");
   const company = symbol ? getCompany(symbol) : undefined;
@@ -216,4 +216,11 @@ export default function CompaniesPage() {
   );
 }
 
+export default function CompaniesPage() {
+  return (
+    <Suspense fallback={<Skeleton className="h-48 w-full" />}>
+      <CompaniesPageContent />
+    </Suspense>
+  );
+}
 
