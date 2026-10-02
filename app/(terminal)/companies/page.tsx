@@ -166,3 +166,35 @@ function CompanyDetail({ company }: { company: Company }) {
   );
 }
 
+
+
+export default function CompaniesPage() {
+  const params = useSearchParams();
+  const symbol = params.get("symbol");
+  const company = symbol ? getCompany(symbol) : undefined;
+
+  if (!company) {
+    return (
+      <div className="space-y-4">
+        <PageHeader
+          title="Companies"
+          description="Explore company quotes and market data."
+        />
+        <EmptyState
+          title="Company not found"
+          description="Select a company from the markets page."
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Companies"
+        description="Live quotes, fundamentals, and historical market data."
+      />
+      <CompanyDetail company={company} />
+    </div>
+  );
+}
