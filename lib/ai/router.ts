@@ -20,7 +20,7 @@ import type {
   ResearchResult,
   ResearchStep,
 } from "@/lib/ai/types";
-import type { Quote } from "@/lib/market-data/types";
+import type { Fundamentals, Quote } from "@/lib/market-data/types";
 
 export async function getAIResult(): Promise<AIResult> {
   initializeProviders();
@@ -110,7 +110,7 @@ export async function runResearch(query: string): Promise<ResearchResult> {
   const ai = await getAIResult();
 
   // --- Evidence collection (market data + news services) ------------------
-  const [marketServed, newsServed] = await Promise.all([
+  const [marketServed, newsServed, fundamentalsServed] = await Promise.all([
     matchedSymbols.length > 0
       ? marketDataService.getQuotes(matchedSymbols).then((served) => ({
           quotes: served.data.quotes,
@@ -125,6 +125,9 @@ export async function runResearch(query: string): Promise<ResearchResult> {
         ? { symbols: matchedSymbols, limit: 6 }
         : { limit: 6 },
     ),
+    matchedSymbols[0]
+      ? marketDataService.getFundamentals(matchedSymbols[0]).catch(() => null)
+      : Promise.resolve(null),
   ]);
 
   const quotes: Quote[] = marketServed.quotes;
@@ -148,7 +151,7 @@ export async function runResearch(query: string): Promise<ResearchResult> {
       id: "sector",
       label: "Sector movement",
       status: "collected",
-      detail: "Computed from the demo universe (live sector data arrives v0.2)",
+      detail: matchedSymbols.length > 0 ? "Live company and market data available; peer-sector breadth remains limited to the configured universe." : "Live index context available; sector breadth requires a broader fundamentals universe.",
     },
     {
       id: "events",
@@ -201,20 +204,30 @@ export async function runResearch(query: string): Promise<ResearchResult> {
   ];
 
   const firstMatched = matchedSymbols[0] ? getCompany(matchedSymbols[0]) : undefined;
+  const liveFundamentals: Fundamentals | null = fundamentalsServed?.data ?? null;
   if (firstMatched) {
+    const fundamentals = liveFundamentals;
     evidence.push({
       id: "ev-fundamentals",
       kind: "fundamentals",
-      label: "Fundamentals (demo)",
+      label: fundamentals ? "Fundamentals" : "Fundamentals (demo fallback)",
       status: "collected",
-      detail: `P/E ${firstMatched.pe}  ·  ROE ${firstMatched.roe}%  ·  Mkt cap ${formatMarketCap(
-        firstMatched.marketCap,
-        firstMatched.currency,
-      )}  ·  52w ${formatPrice(firstMatched.week52Low, firstMatched.currency)} – ${formatPrice(
-        firstMatched.week52High,
-        firstMatched.currency,
-      )}`,
-      source: { providerId: "mock", label: "Demo data (mock)", isMock: true, degraded: false },
+      detail: fundamentals
+        ? `P/E ${fundamentals.pe}  ·  ROE ${fundamentals.roe}%  ·  Mkt cap ${formatMarketCap(
+            fundamentals.marketCap,
+            fundamentals.currency,
+          )}  ·  52w ${formatPrice(fundamentals.week52Low, fundamentals.currency)} – ${formatPrice(
+            fundamentals.week52High,
+            fundamentals.currency,
+          )}`
+        : `P/E ${firstMatched.pe}  ·  ROE ${firstMatched.roe}%  ·  Mkt cap ${formatMarketCap(
+            firstMatched.marketCap,
+            firstMatched.currency,
+          )}  ·  52w ${formatPrice(firstMatched.week52Low, firstMatched.currency)} – ${formatPrice(
+            firstMatched.week52High,
+            firstMatched.currency,
+          )}`,
+      source: fundamentalsServed?.source ?? { providerId: "mock", label: "Demo data (mock)", isMock: true, degraded: false },
     });
   }
 
