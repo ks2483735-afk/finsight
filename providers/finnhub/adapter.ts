@@ -3,6 +3,14 @@ import type { Company, Fundamentals, HistoryRange, MarketDataProvider, PricePoin
 import { envKey } from "@/lib/providers/config";
 
 const BASE_URL = "https://finnhub.io/api/v1";
+const INDEX_UNIVERSE = [
+  { symbol: "^GSPC", name: "S&P 500", region: "US" as const, currency: "USD" as const },
+  { symbol: "^IXIC", name: "Nasdaq Composite", region: "US" as const, currency: "USD" as const },
+  { symbol: "^DJI", name: "Dow Jones Industrial Average", region: "US" as const, currency: "USD" as const },
+  { symbol: "^NSEI", name: "NIFTY 50", region: "IN" as const, currency: "INR" as const },
+  { symbol: "^BSESN", name: "BSE Sensex", region: "IN" as const, currency: "INR" as const },
+];
+
 const INDIAN_SYMBOLS = new Set([
   "RELIANCE","TCS","INFY","HDFCBANK","ICICIBANK","ITC","SBIN",
   "TATAMOTORS","HINDUNILVR","BAJFINANCE","NIFTYBEES",
@@ -157,7 +165,23 @@ export const finnhubProvider: MarketDataProvider = {
   },
 
   async getIndices(): Promise<Quote[]> {
-    throw new Error("Finnhub index adapter is not enabled yet.");
+    const quotes: Quote[] = [];
+    for (const index of INDEX_UNIVERSE) {
+      try {
+        const quote = await request(index.symbol);
+        quotes.push({
+          ...normalize(index.symbol, quote),
+          name: index.name,
+          region: index.region,
+          currency: index.currency,
+          exchange: index.region === "IN" ? "INDEX-IN" : "INDEX-US",
+        });
+      } catch {
+        // Continue so one unsupported index does not hide the rest.
+      }
+    }
+    if (!quotes.length) throw new Error("Finnhub returned no supported index quotes.");
+    return quotes;
   },
 
   async getCompanies(): Promise<Company[]> {
