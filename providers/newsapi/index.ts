@@ -8,8 +8,8 @@ export const newsApiDescriptor: ProviderDescriptor = {
   envVar: "NEWSAPI_API_KEY",
   docsUrl: "https://newsapi.org/docs",
   keyUrl: "https://newsapi.org/register",
-  adapterImplemented: false,
-  plannedIn: "v0.4",
+  adapterImplemented: true,
+  plannedIn: "v0.2",
   description:
     "Headlines and article metadata across global outlets, with clustering.",
 };
