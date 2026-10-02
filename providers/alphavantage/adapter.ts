@@ -1,5 +1,5 @@
 import { getSecret } from "@/lib/database/repos/settings";
-import type { Company, HistoryRange, MarketDataProvider, PricePoint, Quote, QuoteBatch } from "@/lib/market-data/types";
+import type { Company, Fundamentals, HistoryRange, MarketDataProvider, PricePoint, Quote, QuoteBatch } from "@/lib/market-data/types";
 import { envKey } from "@/lib/providers/config";
 
 const BASE_URL = "https://www.alphavantage.co/query";
@@ -104,6 +104,47 @@ async function history(symbol: string, _range: HistoryRange): Promise<PricePoint
   return points.slice(-count);
 }
 
+async function fundamentals(symbol: string): Promise<Fundamentals> {
+  const normalized = symbol.trim().toUpperCase();
+  const url = new URL(BASE_URL);
+  url.searchParams.set("function", "OVERVIEW");
+  url.searchParams.set("symbol", alphaSymbol(normalized));
+  url.searchParams.set("apikey", apiKey());
+
+  const response = await fetch(url, { cache: "no-store" });
+  if (!response.ok) throw new Error(`Alpha Vantage HTTP ${response.status}`);
+  const json = (await response.json()) as Record<string, string>;
+  if (!json.Symbol || json.Note || json.Information || json["Error Message"]) {
+    throw new Error(String(json["Error Message"] || json.Note || json.Information || `No fundamentals for ${normalized}`));
+  }
+
+  const number = (key: string) => {
+    const value = Number(json[key]);
+    return Number.isFinite(value) ? value : 0;
+  };
+
+  return {
+    symbol: normalized,
+    name: json.Name || normalized,
+    marketCap: number("MarketCapitalization"),
+    pe: number("PERatio"),
+    ps: number("PriceToSalesRatioTTM"),
+    pb: number("PriceToBookRatio"),
+    eps: number("EPS"),
+    revenue: number("RevenueTTM"),
+    revenueGrowth: number("QuarterlyRevenueGrowthYOY"),
+    epsGrowth: number("QuarterlyEarningsGrowthYOY"),
+    roe: number("ReturnOnEquityTTM"),
+    dividendYield: number("DividendYield"),
+    debtToEquity: number("DebtToEquity"),
+    week52High: number("52WeekHigh"),
+    week52Low: number("52WeekLow"),
+    currency: INDIAN_SYMBOLS.has(normalized) ? "INR" : "USD",
+    source: "alphavantage",
+    isMock: false,
+  };
+}
+
 export const alphaVantageProvider: MarketDataProvider = {
   id: "alphavantage",
   label: "Alpha Vantage",
@@ -141,4 +182,6 @@ export const alphaVantageProvider: MarketDataProvider = {
   async getCompanies(): Promise<Company[]> {
     throw new Error("Alpha Vantage company adapter is not enabled yet.");
   },
+
+  getFundamentals: fundamentals,
 };
