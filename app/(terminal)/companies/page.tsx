@@ -21,7 +21,24 @@ import { ChartCard } from "@/components/finance/chart-card";
 import { LineChart } from "@/components/finance/line-chart";
 import { ChangeValue } from "@/components/finance/change-value";
 
-interface QuotePayload {\n  quotes: Quote[];\n  source: DataSourceInfo;\n}\n\ninterface HistoryPayload {\n  symbol: string;\n  range: HistoryRange;\n  points: PricePoint[];\n  source: DataSourceInfo;\n}\n\ninterface CompaniesPayload {
+interface QuotePayload {
+  quotes: Quote[];
+  source: DataSourceInfo;
+}
+
+interface HistoryPayload {
+  symbol: string;
+  range: HistoryRange;
+  points: PricePoint[];
+  source: DataSourceInfo;
+}
+
+interface FundamentalsPayload {
+  data: Fundamentals;
+  source: DataSourceInfo;
+}
+
+interface CompaniesPayload {
   companies: Company[];
   source: DataSourceInfo;
 }
@@ -198,3 +215,5 @@ export default function CompaniesPage() {
     </div>
   );
 }
+
+

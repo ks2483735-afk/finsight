@@ -58,6 +58,38 @@ async function resolveMarket<T>(
   };
 }
 
+
+const LIVE_UNIVERSE = [
+  "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "AVGO",
+  "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK", "ITC", "SBIN",
+  "TATAMOTORS", "HINDUNILVR", "BAJFINANCE", "NIFTYBEES",
+];
+
+async function getLiveUniverseQuotes(): Promise<Served<Quote[]> | null> {
+  initializeProviders();
+  const registry = getRegistry();
+
+  for (const adapter of registry.listMarketAdapters()) {
+    try {
+      const data = await adapter.getQuotes(LIVE_UNIVERSE);
+      if (data.quotes?.length) {
+        return {
+          data: data.quotes,
+          source: {
+            providerId: adapter.id,
+            label: adapter.label,
+            isMock: false,
+            degraded: false,
+          },
+        };
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
+}
 async function getLiveCompanies(): Promise<Served<Company[]> | null> {
   initializeProviders();
   const registry = getRegistry();
@@ -211,3 +243,4 @@ export const marketDataService = {
     };
   },
 };
+

@@ -104,6 +104,9 @@ export interface MarketDataProvider {
   getQuotes(symbols: string[]): Promise<QuoteBatch>;
   getAllQuotes(): Promise<Quote[]>;
   getIndices(): Promise<Quote[]>;
+  getHistory?(symbol: string, range: HistoryRange): Promise<PricePoint[]>;
   getCompanies(): Promise<Company[]>;
   getFundamentals?(symbol: string): Promise<Fundamentals>;
 }
+
+

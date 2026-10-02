@@ -67,9 +67,9 @@ async function liveTest(id: string, key: string): Promise<TestResult> {
 
   try {
     const message =
-      descriptor.id === "alphavantage"
+      id === "alphavantage"
         ? await testAlphaVantageConnection()
-        : descriptor.id === "finnhub"
+        : id === "finnhub"
           ? await testFinnhubConnection()
           : "Key present.";
     return { ok: true, requestSent: true, message };
@@ -126,9 +126,9 @@ export async function buildTestResult(id: string): Promise<TestResult | null> {
 
   try {
     const message =
-      descriptor.id === "alphavantage"
+      id === "alphavantage"
         ? await testAlphaVantageConnection()
-        : descriptor.id === "finnhub"
+        : id === "finnhub"
           ? await testFinnhubConnection()
           : "Key present.";
     return { ok: true, requestSent: true, message };
@@ -140,3 +140,4 @@ export async function buildTestResult(id: string): Promise<TestResult | null> {
     };
   }
 }
+
