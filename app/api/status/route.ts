@@ -22,13 +22,21 @@ export async function GET() {
       plannedIn: descriptor.plannedIn,
     }));
 
+    const liveMarketData = providers.some(
+      (provider) => provider.kind === "market-data" && provider.adapterImplemented && provider.configured && provider.enabled,
+    );
+    const liveNews = providers.some(
+      (provider) => provider.kind === "news" && provider.adapterImplemented && provider.configured && provider.enabled,
+    );
+    const mode = liveMarketData && liveNews ? "live" : liveMarketData || liveNews ? "mixed" : "demo";
+
     return ok({
       version: APP_VERSION,
-      mode: "demo",
+      mode,
       database: getDbStatus(),
       providers,
-      liveMarketData: registry.hasLiveMarketData,
-      liveNews: registry.hasLiveNews,
+      liveMarketData,
+      liveNews,
       asOf: new Date().toISOString(),
     });
   } catch (err) {

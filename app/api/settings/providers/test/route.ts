@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const id = typeof body.id === "string" ? body.id : "";
     if (!id) return fail("Missing provider id.", 400);
 
-    const result = buildTestResult(id);
+    const result = await buildTestResult(id);
     if (!result) return fail(`Unknown provider: ${id}`, 404);
     return ok(result);
   } catch (err) {

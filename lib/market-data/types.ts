@@ -57,6 +57,34 @@ export interface Movers {
   losers: Quote[];
 }
 
+export interface PricePoint {
+  timestamp: string;
+  price: number;
+}
+
+export type HistoryRange = "1D" | "1W" | "1M" | "1Y";
+
+export interface Fundamentals {
+  symbol: string;
+  name: string;
+  marketCap: number;
+  pe: number;
+  ps: number;
+  pb: number;
+  eps: number;
+  revenue: number;
+  revenueGrowth: number;
+  epsGrowth: number;
+  roe: number;
+  dividendYield: number;
+  debtToEquity: number;
+  week52High: number;
+  week52Low: number;
+  currency: Currency;
+  source: string;
+  isMock: boolean;
+}
+
 export interface QuoteBatch {
   quotes: Quote[];
   missing: string[];
@@ -76,5 +104,9 @@ export interface MarketDataProvider {
   getQuotes(symbols: string[]): Promise<QuoteBatch>;
   getAllQuotes(): Promise<Quote[]>;
   getIndices(): Promise<Quote[]>;
+  getHistory?(symbol: string, range: HistoryRange): Promise<PricePoint[]>;
   getCompanies(): Promise<Company[]>;
+  getFundamentals?(symbol: string): Promise<Fundamentals>;
 }
+
+

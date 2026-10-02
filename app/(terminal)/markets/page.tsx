@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs } from "@/components/ui/tabs";
 import { Tooltip } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DataSourceChip, MockBadge } from "@/components/ui/badge";
+import { DataSourceChip } from "@/components/ui/badge";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { DataTable, type Column } from "@/components/ui/data-table";
 import { MetricCard } from "@/components/finance/metric-card";
@@ -121,7 +121,7 @@ export default function MarketsPage() {
         description="Indices, equities, and ETFs across US and Indian exchanges — served through the market-data provider pipeline."
         actions={
           <>
-            <MockBadge />
+            {quotes.data ? <DataSourceChip source={quotes.data.source} /> : null}
             <Button variant="outline" size="sm" onClick={refresh} loading={quotes.loading}>
               <RefreshCw className="h-3.5 w-3.5" aria-hidden />
               Refresh
@@ -236,8 +236,8 @@ export default function MarketsPage() {
       </div>
 
       <p className={cn("mt-4 text-2xs text-faint")}>
-        All values on this page are demo data served by the mock adapter. Live providers
-        (Alpha Vantage, Finnhub) arrive in v0.2.
+        Equity quotes use configured live providers when available. Indices and unsupported
+        operations may still use demo data until their dedicated adapters ship.
       </p>
     </div>
   );

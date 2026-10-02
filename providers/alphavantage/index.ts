@@ -8,7 +8,7 @@ export const alphaVantageDescriptor: ProviderDescriptor = {
   envVar: "ALPHA_VANTAGE_API_KEY",
   docsUrl: "https://www.alphavantage.co/documentation",
   keyUrl: "https://www.alphavantage.co/support/#api-key",
-  adapterImplemented: false,
+  adapterImplemented: true,
   plannedIn: "v0.2",
   description:
     "Quotes, time series, and fundamentals for US and Indian markets.",
