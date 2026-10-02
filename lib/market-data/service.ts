@@ -58,6 +58,69 @@ async function resolveMarket<T>(
   };
 }
 
+async function getLiveCompanies(): Promise<Served<Company[]> | null> {
+  initializeProviders();
+  const registry = getRegistry();
+  const fallback = registry.fallbackMarket;
+  if (!fallback) return null;
+
+  const [metadata, quotes] = await Promise.all([
+    fallback.getCompanies(),
+    getLiveUniverseQuotes(),
+  ]);
+  if (!quotes?.data.length) return null;
+
+  const bySymbol = new Map(quotes.data.map((quote) => [quote.symbol, quote]));
+  const companies: Company[] = [];
+  const sources: DataSourceInfo[] = [];
+
+  for (const adapter of registry.listMarketAdapters()) {
+    if (!adapter.getFundamentals) continue;
+    for (const company of metadata) {
+      if (!bySymbol.has(company.symbol)) continue;
+      try {
+        const fundamentals = await adapter.getFundamentals(company.symbol);
+        const quote = bySymbol.get(company.symbol)!;
+        companies.push({
+          ...company,
+          price: quote.price,
+          change: quote.change,
+          changePercent: quote.changePercent,
+          marketCap: fundamentals.marketCap || company.marketCap,
+          pe: fundamentals.pe || company.pe,
+          ps: fundamentals.ps || company.ps,
+          pb: fundamentals.pb || company.pb,
+          roe: fundamentals.roe || company.roe,
+          epsGrowth: fundamentals.epsGrowth || company.epsGrowth,
+          revenueGrowth: fundamentals.revenueGrowth || company.revenueGrowth,
+          dividendYield: fundamentals.dividendYield || company.dividendYield,
+          debtToEquity: fundamentals.debtToEquity || company.debtToEquity,
+          week52High: fundamentals.week52High || company.week52High,
+          week52Low: fundamentals.week52Low || company.week52Low,
+        });
+        sources.push({
+          providerId: adapter.id,
+          label: adapter.label,
+          isMock: false,
+          degraded: false,
+        });
+      } catch {
+        // Try the next live fundamentals provider for this company.
+      }
+    }
+  }
+
+  if (!companies.length) return null;
+  const unique = Array.from(new Map(companies.map((company) => [company.symbol, company])).values());
+  const source = sources.length === 1 ? sources[0] : {
+    providerId: "mixed",
+    label: Array.from(new Set(sources.map((item) => item.label))).join(" + "),
+    isMock: false,
+    degraded: false,
+  };
+  return { data: unique, source };
+}
+
 export const marketDataService = {
   getQuotes(symbols: string[]): Promise<Served<QuoteBatch>> {
     const key = `mq:${[...symbols].map((s) => s.toUpperCase()).sort().join(",")}`;
