@@ -1,13 +1,13 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 import { formatMarketCap, formatPercent, formatPrice } from "@/lib/format";
 import { generateSeries, windowLabels } from "@/lib/mock/series";
-import { SECTORS } from "@/lib/mock/companies";
+import { getCompany } from "@/lib/mock/companies";
 import { fetchJson, useAsyncData } from "@/lib/hooks/use-async-data";
-import type { Company, HistoryRange, PricePoint, Quote } from "@/lib/market-data/types";
+import type { Company, Fundamentals, HistoryRange, PricePoint, Quote } from "@/lib/market-data/types";
 import type { DataSourceInfo } from "@/lib/providers/types";
 import { PageHeader } from "@/components/layout/page-header";
 import { Input, Select } from "@/components/ui/input";
@@ -43,6 +43,10 @@ function CompanyDetail({ company }: { company: Company }) {
     () => fetchJson(`/api/market/quotes?symbols=${encodeURIComponent(company.symbol)}`),
     [company.symbol],
   );
+  const fundamentals = useAsyncData<FundamentalsPayload>(
+    () => fetchJson(`/api/market/fundamentals?symbol=${encodeURIComponent(company.symbol)}`),
+    [company.symbol],
+  );
   const history = useAsyncData<HistoryPayload>(
     () => fetchJson(`/api/market/history?symbol=${encodeURIComponent(company.symbol)}&range=${range}`),
     [company.symbol, range],
@@ -53,6 +57,7 @@ function CompanyDetail({ company }: { company: Company }) {
   const change = liveQuote?.change ?? company.change;
   const changePercent = liveQuote?.changePercent ?? company.changePercent;
   const currency = liveQuote?.currency ?? company.currency;
+  const liveFundamentals = fundamentals.data?.data;
   const series = history.data?.points.map((point) => point.price) ?? [];
   const labels = history.data?.points.length
     ? [history.data.points[0].timestamp.slice(5, 10), history.data.points[history.data.points.length - 1].timestamp.slice(5, 10)]
@@ -131,22 +136,22 @@ function CompanyDetail({ company }: { company: Company }) {
       <Card>
         <CardHeader>
           <CardTitle>Key metrics</CardTitle>
-          <Badge variant="accent">demo fundamentals</Badge>
+          {liveFundamentals ? <DataSourceChip source={fundamentals.data!.source} /> : <Badge variant="accent">demo fallback</Badge>}
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 xl:grid-cols-4">
-            <MetricTile label="Market cap" value={formatMarketCap(company.marketCap, company.currency)} />
-            <MetricTile label="P/E" value={company.pe.toFixed(1)} />
-            <MetricTile label="P/S" value={company.ps.toFixed(1)} />
-            <MetricTile label="P/B" value={company.pb.toFixed(1)} />
-            <MetricTile label="ROE" value={`${company.roe}%`} />
-            <MetricTile label="Revenue growth" value={formatPercent(company.revenueGrowth, 1)} />
-            <MetricTile label="EPS growth" value={formatPercent(company.epsGrowth, 1)} />
-            <MetricTile label="Dividend yield" value={`${company.dividendYield}%`} />
-            <MetricTile label="Debt / equity" value={company.debtToEquity.toFixed(2)} />
+            <MetricTile label="Market cap" value={formatMarketCap(liveFundamentals?.marketCap ?? company.marketCap, company.currency)} />
+            <MetricTile label="P/E" value={(liveFundamentals?.pe ?? company.pe).toFixed(1)} />
+            <MetricTile label="P/S" value={(liveFundamentals?.ps ?? company.ps).toFixed(1)} />
+            <MetricTile label="P/B" value={(liveFundamentals?.pb ?? company.pb).toFixed(1)} />
+            <MetricTile label="ROE" value={`${liveFundamentals?.roe ?? company.roe}%`} />
+            <MetricTile label="Revenue growth" value={formatPercent(liveFundamentals?.revenueGrowth ?? company.revenueGrowth, 1)} />
+            <MetricTile label="EPS growth" value={formatPercent(liveFundamentals?.epsGrowth ?? company.epsGrowth, 1)} />
+            <MetricTile label="Dividend yield" value={`${liveFundamentals?.dividendYield ?? company.dividendYield}%`} />
+            <MetricTile label="Debt / equity" value={(liveFundamentals?.debtToEquity ?? company.debtToEquity).toFixed(2)} />
             <MetricTile
               label="52-week range"
-              value={`${formatPrice(company.week52Low, company.currency)} – ${formatPrice(company.week52High, company.currency)}`}
+              value={`${formatPrice(liveFundamentals?.week52Low ?? company.week52Low, company.currency)} – ${formatPrice(liveFundamentals?.week52High ?? company.week52High, company.currency)}`}
             />
             <MetricTile label="Industry" value={company.industry} />
             <MetricTile label="Currency" value={currency} />
@@ -155,7 +160,7 @@ function CompanyDetail({ company }: { company: Company }) {
       </Card>
 
       <p className="text-2xs text-faint">
-        Market price and history are live when a configured provider supports the symbol; fundamentals remain demo data until the fundamentals adapters ship.
+        Market price, history, and fundamentals are live when a configured provider supports the symbol; unsupported fields fall back to the demo universe.
       </p>
     </div>
   );
