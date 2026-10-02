@@ -1,5 +1,5 @@
 import { getSecret } from "@/lib/database/repos/settings";
-import type { Company, HistoryRange, MarketDataProvider, PricePoint, Quote, QuoteBatch } from "@/lib/market-data/types";
+import type { Company, Fundamentals, HistoryRange, MarketDataProvider, PricePoint, Quote, QuoteBatch } from "@/lib/market-data/types";
 import { envKey } from "@/lib/providers/config";
 
 const BASE_URL = "https://finnhub.io/api/v1";
@@ -84,6 +84,48 @@ async function history(symbol: string, range: HistoryRange): Promise<PricePoint[
   })).filter((point) => Number.isFinite(point.price));
 }
 
+async function fundamentals(symbol: string): Promise<Fundamentals> {
+  const normalized = symbol.trim().toUpperCase();
+  const url = new URL(`${BASE_URL}/stock/metric`);
+  url.searchParams.set("symbol", normalized);
+  url.searchParams.set("metric", "all");
+  url.searchParams.set("token", apiKey());
+
+  const response = await fetch(url, { cache: "no-store" });
+  if (!response.ok) throw new Error(`Finnhub HTTP ${response.status}`);
+  const json = (await response.json()) as {
+    metric?: Record<string, number | undefined>;
+  };
+  const m = json.metric;
+  if (!m) throw new Error(`Finnhub returned no fundamentals for ${normalized}`);
+
+  const value = (key: string) => {
+    const n = Number(m[key]);
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  return {
+    symbol: normalized,
+    name: normalized,
+    marketCap: value("marketCapitalization") * 1_000_000,
+    pe: value("peBasicExclExtraTTM") || value("peNormalizedAnnual"),
+    ps: value("psTTM"),
+    pb: value("pbQuarterly"),
+    eps: value("epsBasicExclExtraItemsTTM"),
+    revenue: 0,
+    revenueGrowth: value("revenueGrowthTTMYoy"),
+    epsGrowth: value("epsGrowthTTMYoy"),
+    roe: value("roeTTM"),
+    dividendYield: value("dividendYieldIndicatedAnnual"),
+    debtToEquity: value("debtEquityAnnual"),
+    week52High: value("52WeekHigh"),
+    week52Low: value("52WeekLow"),
+    currency: "USD",
+    source: "finnhub",
+    isMock: false,
+  };
+}
+
 export const finnhubProvider: MarketDataProvider = {
   id: "finnhub",
   label: "Finnhub",
@@ -121,4 +163,6 @@ export const finnhubProvider: MarketDataProvider = {
   async getCompanies(): Promise<Company[]> {
     throw new Error("Finnhub company adapter is not enabled yet.");
   },
+
+  getFundamentals: fundamentals,
 };
