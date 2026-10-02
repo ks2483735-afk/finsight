@@ -13,7 +13,7 @@
 import { initializeProviders } from "@/providers";
 import { getRegistry } from "@/lib/providers/registry";
 import { cached, CACHE_TTL } from "@/lib/cache/ttl";
-import type { HistoryRange, MarketDataProvider, Company, Movers, PricePoint, Quote, QuoteBatch } from "@/lib/market-data/types";
+import type { Fundamentals, HistoryRange, MarketDataProvider, Company, Movers, PricePoint, Quote, QuoteBatch } from "@/lib/market-data/types";
 import type { DataSourceInfo } from "@/lib/providers/types";
 
 export interface Served<T> {
@@ -78,6 +78,32 @@ export const marketDataService = {
     return cached("midx", CACHE_TTL.price, () =>
       resolveMarket((adapter) => adapter.getIndices()),
     );
+  },
+
+  async getFundamentals(symbol: string): Promise<Served<Fundamentals>> {
+    initializeProviders();
+    const registry = getRegistry();
+    const normalized = symbol.trim().toUpperCase();
+
+    for (const adapter of registry.listMarketAdapters()) {
+      if (!adapter.getFundamentals) continue;
+      try {
+        const data = await adapter.getFundamentals(normalized);
+        return {
+          data,
+          source: {
+            providerId: adapter.id,
+            label: adapter.label,
+            isMock: false,
+            degraded: false,
+          },
+        };
+      } catch {
+        continue;
+      }
+    }
+
+    throw new Error(`No live fundamentals are available for ${normalized}.`);
   },
 
   getCompanies(): Promise<Served<Company[]>> {
