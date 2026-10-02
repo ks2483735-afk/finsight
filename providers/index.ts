@@ -19,7 +19,9 @@ import { alphaVantageProvider } from "./alphavantage/adapter";
 import { finnhubDescriptor } from "./finnhub";
 import { finnhubProvider } from "./finnhub/adapter";
 import { newsApiDescriptor } from "./newsapi";
+import { newsApiProvider } from "./newsapi/adapter";
 import { rssDescriptor } from "./rss";
+import { rssProvider } from "./rss/adapter";
 import { mockMarketProvider } from "./mock/market-data";
 import { mockNewsProvider } from "./mock/news";
 
@@ -31,7 +33,7 @@ export const PROVIDER_DESCRIPTORS: ProviderDescriptor[] = [
   // Market data (adapters land v0.2)
   alphaVantageDescriptor,
   finnhubDescriptor,
-  // News (adapters land v0.4)
+  // News (live in v0.2)
   newsApiDescriptor,
   rssDescriptor,
 ];
@@ -54,5 +56,7 @@ export function initializeProviders(): void {
   // v0.2 live market adapters.
   registry.registerMarketAdapter(finnhubProvider);
   registry.registerMarketAdapter(alphaVantageProvider);
+  registry.registerNewsAdapter(rssProvider);
+  registry.registerNewsAdapter(newsApiProvider);
   globalRef.__finsightProvidersReady = true;
 }
