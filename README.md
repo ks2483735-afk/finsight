@@ -2,13 +2,17 @@
 
 **An open-source, local-first, BYOK finance research terminal.**
 
+[![Latest Release](https://img.shields.io/github/v/release/ks2483735-afk/finsight?display_name=tag&sort=semver)](https://github.com/ks2483735-afk/finsight/releases) [![License](https://img.shields.io/github/license/ks2483735-afk/finsight)](https://github.com/ks2483735-afk/finsight/blob/main/LICENSE)
+
+**Live demo:** https://finsight.freebuff.app/  ·  **Latest release:** [v0.2.0 — Live Market Data](https://github.com/ks2483735-afk/finsight/releases/tag/v0.2.0)
+
 Ask a financial question → FinSight retrieves market and news evidence → your selected AI provider interprets it → you get an answer with sources. Evidence and AI interpretation are always kept clearly separate.
 
-> **Status: v0.2 — Live Market Data.** This release keeps the local-first terminal foundation and adds live market-data adapters for Finnhub and Alpha Vantage, plus live news ingestion through public RSS feeds. AI interpretation remains planned for v0.3, while additional news integrations continue in v0.4. FinSight never presents demo data as live data.
+> **Status: v0.2.0 — Live Market Data.** This release keeps the local-first terminal foundation and adds live market-data adapters for Finnhub and Alpha Vantage, plus live news ingestion through public RSS feeds. AI interpretation remains planned for v0.3, while additional news integrations continue in v0.4. FinSight never presents demo data as live data.
 
 ---
 
-## What works today (v0.2)
+## What works today (v0.2.0)
 
 | Area | State |
 | --- | --- |
@@ -154,6 +158,16 @@ finsight/
 └── package.json
 ```
 
+## v0.2.0 verification
+
+The v0.2.0 release was verified with:
+
+- `npm run typecheck` passing
+- Production build passing from a fresh clone
+- Live Finnhub market data verified
+- Alpha Vantage connection testing verified, including honest provider rate-limit responses
+- No API keys committed to the repository
+
 ## Verification
 
 ```bash
@@ -175,6 +189,13 @@ Every data-driven view handles **loading** (skeletons), **loaded**, **empty** (w
 - Rotate a key by revoking it at the provider, then updating it in Settings.
 - The Settings → Data page can wipe all local data (records and stored keys).
 - **Never commit real API keys to GitHub.**
+
+## Roadmap
+
+- **v0.3** — AI-powered financial interpretation and sourced AI answers
+- **v0.4** — Expanded news intelligence and additional news integrations
+- **v0.5** — Earnings, company events, and SEC/MCA filings
+- **v0.7** — Alert evaluation and notifications
 
 ## Contributing
 
