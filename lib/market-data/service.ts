@@ -5,9 +5,9 @@
  *   preferred configured provider → fallback provider → demo data →
  *   clear "unavailable" message.
  *
- * In v0.1 no live adapter is registered yet, so requests resolve to the
- * mock adapter with source.isMock = true and (if live providers were ever
- * attempted) source.degraded = true — the UI surfaces both honestly.
+ * Live adapters are tried in registration order. If all live providers fail,
+ * the service falls back to the mock adapter with source.isMock = true and
+ * source.degraded = true — the UI surfaces the degraded state honestly.
  */
 
 import { initializeProviders } from "@/providers";
