@@ -2,8 +2,8 @@
  * Provider bootstrap.
  *
  * Imports every provider descriptor, registers them with the registry, and
- * installs the mock/demo fallbacks. Live adapters (v0.2+) will register
- * here via registry.registerMarketAdapter(...) / registerNewsAdapter(...).
+ * installs the mock/demo fallbacks, and registers the live adapters shipped
+ * in the current release.
  *
  * Services call initializeProviders() on entry; it is idempotent and safe
  * across dev hot-reloads.
@@ -30,7 +30,7 @@ export const PROVIDER_DESCRIPTORS: ProviderDescriptor[] = [
   geminiDescriptor,
   aimlapiDescriptor,
   bazaarlinkDescriptor,
-  // Market data (adapters land v0.2)
+  // Market data (live adapters in v0.2)
   alphaVantageDescriptor,
   finnhubDescriptor,
   // News (live in v0.2)
@@ -46,8 +46,8 @@ export function initializeProviders(): void {
   for (const descriptor of PROVIDER_DESCRIPTORS) {
     registry.registerDescriptor(descriptor);
   }
-  // Spec §23 fallback chain: live providers (none yet) → demo data →
-  // clear "unavailable" message. The mock adapter is never presented as a
+  // Spec §23 fallback chain: live providers → demo data → clear
+  // "unavailable" message. The mock adapter is never presented as a
   // real API; its payload carries isMock = true end-to-end.
   registry.registerFallbacks({
     market: mockMarketProvider,
