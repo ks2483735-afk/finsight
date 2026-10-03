@@ -12,6 +12,18 @@ Ask a financial question → FinSight retrieves market and news evidence → you
 
 ---
 
+## 📸 FinSight in action
+
+### Overview dashboard
+
+![FinSight Overview Dashboard](public/screenshots/overview-dashboard.png)
+
+### Landing page
+
+![FinSight Landing Page](public/screenshots/landing-page.png)
+
+---
+
 ## What works today (v0.2.0)
 
 | Area | State |
