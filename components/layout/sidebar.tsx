@@ -102,7 +102,7 @@ function BrandBlock({ collapsed }: { collapsed: boolean }) {
             <span className="text-[15px] font-semibold tracking-tight text-foreground">
               FinSight
             </span>
-            <span className="text-2xs font-medium text-faint">v0.1</span>
+            <span className="text-2xs font-medium text-faint">v0.2.0</span>
           </span>
         )}
       </Link>
