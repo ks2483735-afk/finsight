@@ -18,9 +18,7 @@ Ask a financial question → FinSight retrieves market and news evidence → you
 
 ![FinSight Overview Dashboard](public/screenshots/overview-dashboard.png)
 
-### Landing page
-
-![FinSight Landing Page](public/screenshots/landing-page.png)
+The landing-page screenshot will be added alongside the dashboard image once the second PNG is uploaded to `public/screenshots/`.
 
 ---
 
