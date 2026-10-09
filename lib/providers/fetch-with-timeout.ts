@@ -1,23 +1,21 @@
 /**
  * Bound upstream provider requests so a stalled API/feed cannot hang a page.
- * The abort signal stops the underlying fetch rather than merely racing it.
+ * AbortSignal remains active while the response body is being consumed too.
  */
 export async function fetchWithTimeout(
   input: RequestInfo | URL,
   init: RequestInit = {},
   timeoutMs = 8_000,
 ): Promise<Response> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
-
   try {
-    return await fetch(input, { ...init, signal: controller.signal });
+    return await fetch(input, {
+      ...init,
+      signal: AbortSignal.timeout(timeoutMs),
+    });
   } catch (error) {
-    if (controller.signal.aborted) {
+    if (error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError")) {
       throw new Error(`Upstream request timed out after ${timeoutMs}ms.`);
     }
     throw error;
-  } finally {
-    clearTimeout(timeout);
   }
 }
