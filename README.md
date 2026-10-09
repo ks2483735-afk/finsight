@@ -4,7 +4,7 @@
 
 [![Latest Release](https://img.shields.io/github/v/release/ks2483735-afk/finsight?display_name=tag&sort=semver)](https://github.com/ks2483735-afk/finsight/releases) [![License](https://img.shields.io/github/license/ks2483735-afk/finsight)](https://github.com/ks2483735-afk/finsight/blob/main/LICENSE)
 
-**Live demo:** https://finsight.freebuff.app/  ·  **Latest release:** [v0.2.0 — Live Market Data](https://github.com/ks2483735-afk/finsight/releases/tag/v0.2.0)
+**Latest release:** [v0.2.0 — Live Market Data](https://github.com/ks2483735-afk/finsight/releases/tag/v0.2.0)
 
 Ask a financial question → FinSight retrieves market and news evidence → your selected AI provider interprets it → you get an answer with sources. Evidence and AI interpretation are always kept clearly separate.
 
