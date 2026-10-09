@@ -41,8 +41,8 @@ Ask a financial question → FinSight retrieves market and news evidence → you
 | Alpha Vantage live market-data adapter | ✅ |
 | Public RSS news adapter (no API key required) | ✅ |
 | NewsAPI adapter | ✅ available; requires a NewsAPI key |
-| Google Gemini adapter | ⏳ v0.3 |
-| AI answers / citations | ⏳ v0.3 |
+| Google Gemini adapter | ⏳ Planned — not implemented |
+| AI answers / citations | ⏳ Planned — not implemented |
 | Earnings/events and SEC/MCA filings ingestion | ⏳ v0.5 |
 | Alert evaluation & notifications | ⏳ v0.7 |
 
@@ -90,9 +90,9 @@ Keys can also be added later at **Settings → Providers**. They are stored serv
 
 | Provider | Kind | Adapter | Status |
 | --- | --- | --- | --- |
-| Google Gemini | AI | descriptor only | ⏳ v0.3 |
-| AIMLAPI | AI | descriptor only | ⏳ v0.3 |
-| BazaarLink | AI | descriptor only | ⏳ v0.3 |
+| Google Gemini | AI | descriptor only | ⏳ planned |
+| AIMLAPI | AI | descriptor only | ⏳ planned |
+| BazaarLink | AI | descriptor only | ⏳ planned |
 | Alpha Vantage | Market data | live | ✅ v0.2 |
 | Finnhub | Market data | live | ✅ v0.2 |
 | NewsAPI | News | live | ✅ available with key |
@@ -129,9 +129,9 @@ Design rules enforced in code:
 | Variable | Purpose | Default |
 | --- | --- | --- |
 | `FINSIGHT_DB_PATH` | Local SQLite database path | `./data/finsight.db` |
-| `GEMINI_API_KEY` | AI (v0.3) | — |
-| `AIMLAPI_API_KEY` / `AIMLAPI_BASE_URL` | AI (v0.3) | — |
-| `BAZAARLINK_API_KEY` / `BAZAARLINK_BASE_URL` | AI (v0.3) | — |
+| `GEMINI_API_KEY` | Planned AI integration | — |
+| `AIMLAPI_API_KEY` / `AIMLAPI_BASE_URL` | Planned AI integration | — |
+| `BAZAARLINK_API_KEY` / `BAZAARLINK_BASE_URL` | Planned AI integration | — |
 | `ALPHA_VANTAGE_API_KEY` | Live market data | — |
 | `FINNHUB_API_KEY` | Live market data | — |
 | `NEWSAPI_API_KEY` | NewsAPI | — |
