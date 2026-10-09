@@ -1,6 +1,7 @@
 import { getSecret } from "@/lib/database/repos/settings";
 import type { NewsProvider, NewsQuery, NewsStory } from "@/lib/news/types";
 import { envKey } from "@/lib/providers/config";
+import { fetchWithTimeout } from "@/lib/providers/fetch-with-timeout";
 
 const BASE_URL = "https://newsapi.org/v2";
 
@@ -31,7 +32,7 @@ export const newsApiProvider: NewsProvider = {
     url.searchParams.set("category", categoryFor(query));
     url.searchParams.set("country", query.category === "India" ? "in" : "us");
 
-    const response = await fetch(url, { cache: "no-store" });
+    const response = await fetchWithTimeout(url, { cache: "no-store" });
     if (!response.ok) throw new Error("NewsAPI HTTP " + response.status);
     const json = (await response.json()) as {
       status?: string;
