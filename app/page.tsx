@@ -73,7 +73,7 @@ export default function LandingPage() {
           <Link href="/" className="flex items-center gap-2.5">
             <LogoMark size={22} />
             <span className="text-sm font-semibold tracking-tight">FinSight</span>
-            <span className="text-2xs font-medium text-faint">v0.2.0</span>
+            <span className="text-2xs font-medium text-faint">v0.3.0</span>
           </Link>
           <nav className="flex items-center gap-5">
             <a href="#architecture" className="hidden text-sm text-muted transition-colors hover:text-foreground sm:block">
@@ -109,7 +109,7 @@ export default function LandingPage() {
         <div className="relative mx-auto max-w-6xl px-5 py-20 sm:py-24">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex h-5 items-center rounded border border-accent-border bg-accent-soft px-1.5 text-2xs font-medium uppercase tracking-wider text-accent">
-              v0.2.0 · Foundation
+              v0.3.0 · Performance
             </span>
             <span className="text-2xs text-faint">Open source · MIT · Local-first · BYOK</span>
           </div>
