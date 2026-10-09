@@ -1,6 +1,7 @@
 import { getSecret } from "@/lib/database/repos/settings";
 import type { Company, Fundamentals, HistoryRange, MarketDataProvider, PricePoint, Quote, QuoteBatch } from "@/lib/market-data/types";
 import { envKey } from "@/lib/providers/config";
+import { fetchWithTimeout } from "@/lib/providers/fetch-with-timeout";
 
 const BASE_URL = "https://www.alphavantage.co/query";
 
@@ -27,7 +28,7 @@ async function request(symbol: string): Promise<AlphaQuote> {
   url.searchParams.set("symbol", symbol);
   url.searchParams.set("apikey", apiKey());
 
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetchWithTimeout(url, { cache: "no-store" });
   if (!response.ok) throw new Error(`Alpha Vantage HTTP ${response.status}`);
   const json = (await response.json()) as {
     "Global Quote"?: AlphaQuote;
@@ -85,7 +86,7 @@ async function history(symbol: string, _range: HistoryRange): Promise<PricePoint
   url.searchParams.set("outputsize", "compact");
   url.searchParams.set("apikey", apiKey());
 
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetchWithTimeout(url, { cache: "no-store" });
   if (!response.ok) throw new Error(`Alpha Vantage HTTP ${response.status}`);
   const json = (await response.json()) as Record<string, unknown>;
   if (json["Error Message"] || json.Note || json.Information) {
@@ -111,7 +112,7 @@ async function fundamentals(symbol: string): Promise<Fundamentals> {
   url.searchParams.set("symbol", alphaSymbol(normalized));
   url.searchParams.set("apikey", apiKey());
 
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetchWithTimeout(url, { cache: "no-store" });
   if (!response.ok) throw new Error(`Alpha Vantage HTTP ${response.status}`);
   const json = (await response.json()) as Record<string, string>;
   if (!json.Symbol || json.Note || json.Information || json["Error Message"]) {
