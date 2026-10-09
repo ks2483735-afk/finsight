@@ -205,6 +205,12 @@ Every data-driven view handles **loading** (skeletons), **loaded**, **empty** (w
 - The Settings → Data page can wipe all local data (records and stored keys).
 - **Never commit real API keys to GitHub.**
 
+## Public deployment limitation
+
+FinSight is currently a **local-first, single-user app**. It does not yet provide authentication or per-user database isolation. For safety, the production middleware disables the personal-data APIs on non-local hosts: watchlists, portfolios, alerts, and provider settings return HTTP 503 on a public deployment. Public market/news/research demo routes remain available.
+
+Run FinSight on your own computer to use personal data and save provider keys. Do not deploy this version as a multi-user service or store personal financial data on a shared host. Proper hosted support requires authentication, per-user data isolation, and a suitable persistent database before those APIs can be enabled publicly.
+
 ## Roadmap
 
 - **Next** — AI-powered financial interpretation and sourced AI answers
