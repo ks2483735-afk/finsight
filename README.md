@@ -4,11 +4,11 @@
 
 [![Latest Release](https://img.shields.io/github/v/release/ks2483735-afk/finsight?display_name=tag&sort=semver)](https://github.com/ks2483735-afk/finsight/releases) [![License](https://img.shields.io/github/license/ks2483735-afk/finsight)](https://github.com/ks2483735-afk/finsight/blob/main/LICENSE)
 
-**Latest release:** [v0.2.0 — Live Market Data](https://github.com/ks2483735-afk/finsight/releases/tag/v0.2.0)
+**Latest release:** [v0.3.0 — Performance & Reliability](https://github.com/ks2483735-afk/finsight/releases/tag/v0.3.0)
 
 Ask a financial question → FinSight retrieves market and news evidence → your selected AI provider interprets it → you get an answer with sources. Evidence and AI interpretation are always kept clearly separate.
 
-> **Status: v0.2.0 — Live Market Data.** This release keeps the local-first terminal foundation and adds live market-data adapters for Finnhub and Alpha Vantage, plus live news ingestion through public RSS feeds. AI interpretation remains planned for v0.3, while additional news integrations continue in v0.4. FinSight never presents demo data as live data.
+> **Status: v0.3.0 — Performance & Reliability.** Builds on the live-data foundation with improved request deduplication and caching, provider request timeouts, refreshed UI screenshots, and README updates. Live market data is available through Finnhub and Alpha Vantage, with news ingestion through public RSS feeds. AI interpretation is still planned and is not included in this release. FinSight never presents demo data as live data.
 
 ---
 
@@ -24,7 +24,7 @@ Ask a financial question → FinSight retrieves market and news evidence → you
 
 ---
 
-## What works today (v0.2.0)
+## What works today (v0.3.0)
 
 | Area | State |
 | --- | --- |
@@ -36,7 +36,7 @@ Ask a financial question → FinSight retrieves market and news evidence → you
 | Watchlist, Portfolio, Alerts — CRUD backed by local SQLite | ✅ |
 | Calculators (SIP, Lumpsum, CAGR, Compound, EMI, Dividend) | ✅ deterministic |
 | BYOK Settings (store keys, enable/disable, honest connection tests) | ✅ |
-| Provider architecture (interfaces, registry, fallback chain, TTL cache) | ✅ |
+| Provider architecture (interfaces, registry, fallback chain, TTL cache and request deduplication) | ✅ |
 | Finnhub live market-data adapter | ✅ |
 | Alpha Vantage live market-data adapter | ✅ |
 | Public RSS news adapter (no API key required) | ✅ |
@@ -170,15 +170,18 @@ finsight/
 └── package.json
 ```
 
-## v0.2.0 verification
+## v0.3.0 verification
 
-The v0.2.0 release was verified with:
+The v0.3.0 code on `main` was verified with:
 
 - `npm run typecheck` passing
-- Production build passing from a fresh clone
-- Live Finnhub market data verified
-- Alpha Vantage connection testing verified, including honest provider rate-limit responses
+- `npm run build` passing (optimized production build)
+- Request deduplication and TTL cache improvements
+- 8-second abort timeouts for supported external data-provider requests
+- Updated landing-page and overview-dashboard screenshots
 - No API keys committed to the repository
+
+Live-provider behavior still depends on your own provider keys, quotas, and network availability.
 
 ## Verification
 
@@ -204,8 +207,8 @@ Every data-driven view handles **loading** (skeletons), **loaded**, **empty** (w
 
 ## Roadmap
 
-- **v0.3** — AI-powered financial interpretation and sourced AI answers
-- **v0.4** — Expanded news intelligence and additional news integrations
+- **Next** — AI-powered financial interpretation and sourced AI answers
+- **Following** — Expanded news intelligence and additional news integrations
 - **v0.5** — Earnings, company events, and SEC/MCA filings
 - **v0.7** — Alert evaluation and notifications
 
