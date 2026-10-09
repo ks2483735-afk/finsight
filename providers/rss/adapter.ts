@@ -1,4 +1,5 @@
 import type { NewsProvider, NewsQuery, NewsStory } from "@/lib/news/types";
+import { fetchWithTimeout } from "@/lib/providers/fetch-with-timeout";
 
 const FEEDS = [
   { category: "Markets" as const, url: "https://news.google.com/rss/search?q=stock%20market&hl=en-US&gl=US&ceid=US:en" },
@@ -28,7 +29,7 @@ export const rssProvider: NewsProvider = {
 
   async getStories(query = {}): Promise<NewsStory[]> {
     const feed = FEEDS.find((item) => query.category === item.category) ?? FEEDS[0];
-    const response = await fetch(feed.url, { cache: "no-store" });
+    const response = await fetchWithTimeout(feed.url, { cache: "no-store" });
     if (!response.ok) throw new Error("RSS HTTP " + response.status);
     const xml = await response.text();
     const items = xml.match(/<item>[\s\S]*?<\/item>/gi) ?? [];

@@ -1,6 +1,7 @@
 import { getSecret } from "@/lib/database/repos/settings";
 import type { Company, Fundamentals, HistoryRange, MarketDataProvider, PricePoint, Quote, QuoteBatch } from "@/lib/market-data/types";
 import { envKey } from "@/lib/providers/config";
+import { fetchWithTimeout } from "@/lib/providers/fetch-with-timeout";
 
 const BASE_URL = "https://finnhub.io/api/v1";
 const INDEX_UNIVERSE = [
@@ -38,7 +39,7 @@ async function request(symbol: string): Promise<FinnhubQuote> {
   url.searchParams.set("symbol", symbol);
   url.searchParams.set("token", apiKey());
 
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetchWithTimeout(url, { cache: "no-store" });
   if (!response.ok) throw new Error(`Finnhub HTTP ${response.status}`);
   const json = (await response.json()) as FinnhubQuote;
   if (typeof json.c !== "number" || typeof json.dp !== "number") {
@@ -80,7 +81,7 @@ async function history(symbol: string, range: HistoryRange): Promise<PricePoint[
   url.searchParams.set("to", String(now));
   url.searchParams.set("token", apiKey());
 
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetchWithTimeout(url, { cache: "no-store" });
   if (!response.ok) throw new Error(`Finnhub HTTP ${response.status}`);
   const json = (await response.json()) as { s?: string; t?: number[]; c?: number[] };
   if (json.s !== "ok" || !json.t?.length || !json.c?.length) {
@@ -99,7 +100,7 @@ async function fundamentals(symbol: string): Promise<Fundamentals> {
   url.searchParams.set("metric", "all");
   url.searchParams.set("token", apiKey());
 
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetchWithTimeout(url, { cache: "no-store" });
   if (!response.ok) throw new Error(`Finnhub HTTP ${response.status}`);
   const json = (await response.json()) as {
     metric?: Record<string, number | undefined>;
