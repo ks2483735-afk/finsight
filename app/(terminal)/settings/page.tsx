@@ -523,6 +523,7 @@ export default function SettingsPage() {
                   ["Stack", "Next.js · React · TypeScript · Tailwind CSS"],
                   ["Database", "Local SQLite; personal-data APIs are disabled on public hosts"],
                   ["Architecture", "UI → services → provider registry → adapters"],
+                  ["Performance", "Static landing page, concurrent supported requests, bounded timeouts, and instant mock fallbacks"],
                 ].map(([label, value]) => (
                   <div key={label} className="rounded-md border border-border bg-background px-3 py-2.5">
                     <dt className="text-2xs uppercase tracking-wider text-faint">{label}</dt>
@@ -540,11 +541,11 @@ export default function SettingsPage() {
             <CardContent>
               <ul className="space-y-2 text-xs text-secondary">
                 {[
-                  ["Current", "v0.3.0 — live market quotes, RSS/NewsAPI news, caching, and provider timeouts"],
-                  ["Next", "Gemini AI integration, financial interpretation, and sourced answers"],
-                  ["Following", "Expanded news intelligence, clustering, and additional integrations"],
-                  ["v0.5", "Earnings, company events, and SEC/MCA filings"],
-                  ["v0.7", "Alert evaluation and notifications"],
+                  ["Current", `v${APP_VERSION} — faster provider routing, concurrent supported requests, static landing delivery, and zero artificial mock delays`],
+                  ["Next", "v0.5 — Gemini AI integration, financial interpretation, and sourced answers"],
+                  ["Following", "v0.6 — expanded news intelligence, clustering, and richer daily briefs"],
+                  ["v0.7", "Earnings, company events, and SEC/MCA filings"],
+                  ["v0.8", "Alert evaluation and notifications"],
                 ].map(([version, item]) => (
                   <li key={version} className="flex gap-3">
                     <span className="mono w-10 shrink-0 text-accent">{version}</span>
