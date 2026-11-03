@@ -47,6 +47,7 @@ FinSight prioritizes honest data and predictable provider behavior over pretendi
 | Calculators (SIP, Lumpsum, CAGR, Compound, EMI, Dividend) | ✅ deterministic |
 | BYOK Settings (store keys, enable/disable, honest connection tests) | ✅ |
 | Provider architecture (interfaces, registry, fallback chain, TTL cache and request deduplication) | ✅ |
+| Performance improvements (bounded provider calls, supported concurrency, instant mock fallbacks, static landing page) | ✅ v0.4.0 |
 | Finnhub live market-data adapter | ✅ |
 | Alpha Vantage live market-data adapter | ✅ |
 | Public RSS news adapter (no API key required) | ✅ |
