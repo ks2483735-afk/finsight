@@ -1,6 +1,6 @@
 import type { ProviderDescriptor } from "@/lib/providers/types";
 
-/** NewsAPI — descriptor only. The real adapter ships in v0.4. */
+/** NewsAPI — implemented live headline adapter; requires a user-supplied key. */
 export const newsApiDescriptor: ProviderDescriptor = {
   id: "newsapi",
   name: "NewsAPI",
@@ -11,5 +11,5 @@ export const newsApiDescriptor: ProviderDescriptor = {
   adapterImplemented: true,
   plannedIn: "v0.2",
   description:
-    "Headlines and article metadata across global outlets, with clustering.",
+    "Headlines and article metadata from the NewsAPI top-headlines endpoint.",
 };
