@@ -67,7 +67,7 @@ function ResearchHero() {
         {[
           { icon: Database, label: "1 · Retrieve evidence", hint: "market · news · filings" },
           { icon: ClipboardList, label: "2 · Show the pipeline", hint: "step-by-step status" },
-          { icon: BrainCircuit, label: "3 · AI interpretation", hint: "requires a BYOK key (v0.3)" },
+          { icon: BrainCircuit, label: "3 · AI interpretation", hint: "AI adapter planned for v0.5" },
         ].map((step) => (
           <div
             key={step.label}
