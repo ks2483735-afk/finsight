@@ -33,7 +33,7 @@ export async function getAIResult(): Promise<AIResult> {
   const implemented = configured.filter((d) => d.adapterImplemented);
 
   if (implemented.length > 0) {
-    // Future (v0.3): dispatch to the first healthy adapter.
+    // Future (v0.5): dispatch to the first healthy adapter.
     return {
       available: false,
       providerId: implemented[0].id,
