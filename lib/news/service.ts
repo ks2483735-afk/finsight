@@ -24,7 +24,8 @@ async function resolveNews(
   for (const adapter of registry.listNewsAdapters()) {
     const descriptor = registry.getDescriptor(adapter.id);
     if (
-      !descriptor?.adapterImplemented ||
+      !descriptor ||
+      !descriptor.adapterImplemented ||
       !isProviderEnabled(adapter.id) ||
       !getKeyStatus(descriptor).configured
     ) {
