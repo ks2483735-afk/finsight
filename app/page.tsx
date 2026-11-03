@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { LogoMark } from "@/components/layout/sidebar";
 import { MarketPreview } from "@/components/finance/market-preview";
+import { APP_VERSION } from "@/lib/nav";
 
 const FEATURES = [
   {
@@ -24,8 +25,8 @@ const FEATURES = [
   },
   {
     icon: Waypoints,
-    title: "Provider adapters",
-    body: "Market data, news, and AI sit behind interfaces. Swap providers without touching the UI.",
+    title: "Faster provider routing",
+    body: "Only enabled, configured providers are called. Supported quote requests run concurrently, with bounded timeouts and honest demo fallbacks.",
   },
   {
     icon: FileSearch,
@@ -68,7 +69,7 @@ export default function LandingPage() {
           <Link href="/" className="flex items-center gap-2.5">
             <LogoMark size={22} />
             <span className="text-sm font-semibold tracking-tight">FinSight</span>
-            <span className="text-2xs font-medium text-faint">v0.3.0</span>
+            <span className="text-2xs font-medium text-faint">v{APP_VERSION}</span>
           </Link>
           <nav className="flex items-center gap-5">
             <a href="#architecture" className="hidden text-sm text-muted transition-colors hover:text-foreground sm:block">
@@ -104,7 +105,7 @@ export default function LandingPage() {
         <div className="relative mx-auto max-w-6xl px-5 py-20 sm:py-24">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex h-5 items-center rounded border border-accent-border bg-accent-soft px-1.5 text-2xs font-medium uppercase tracking-wider text-accent">
-              v0.3.0 · Performance
+              v{APP_VERSION} · Performance & reliability
             </span>
             <span className="text-2xs text-faint">Open source · MIT · Local-first · BYOK</span>
           </div>
@@ -116,9 +117,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-secondary sm:text-lg">
-            Ask a financial question, retrieve market and news evidence, and read the answer
-            with sources. Your keys, your machine, your data — with provider adapters that
-            never lock you in.
+            Explore market and news evidence, inspect where each data point comes from, and build a clearer research picture. Your keys, your machine, your data — with provider adapters that never lock you in. AI-generated interpretation remains on the roadmap.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
