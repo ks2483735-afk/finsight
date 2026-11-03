@@ -26,7 +26,7 @@ import { mockMarketProvider } from "./mock/market-data";
 import { mockNewsProvider } from "./mock/news";
 
 export const PROVIDER_DESCRIPTORS: ProviderDescriptor[] = [
-  // AI (adapters land v0.3)
+  // AI (planned adapters in v0.5)
   geminiDescriptor,
   aimlapiDescriptor,
   bazaarlinkDescriptor,
