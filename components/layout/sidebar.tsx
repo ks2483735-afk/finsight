@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { NAV_GROUPS } from "@/lib/nav";
+import { APP_VERSION, NAV_GROUPS } from "@/lib/nav";
 import { useShell } from "@/components/layout/shell";
 import { Tooltip } from "@/components/ui/tooltip";
 
@@ -102,7 +102,7 @@ function BrandBlock({ collapsed }: { collapsed: boolean }) {
             <span className="text-[15px] font-semibold tracking-tight text-foreground">
               FinSight
             </span>
-            <span className="text-2xs font-medium text-faint">v0.3.0</span>
+            <span className="text-2xs font-medium text-faint">v{APP_VERSION}</span>
           </span>
         )}
       </Link>
