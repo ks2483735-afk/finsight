@@ -1,7 +1,7 @@
 module.exports = {
   version: "7.0",
   title: "FinSight",
-  description: "Open-source AI financial research terminal.",
+  description: "Open-source finance research terminal with live market/news providers and clearly labeled demo fallbacks.",
   menu: async (kernel, info) => {
     const installed = info.exists("node_modules");
     const running = {
