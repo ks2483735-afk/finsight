@@ -30,17 +30,14 @@ export const mockMarketProvider: MarketDataProvider = {
   },
 
   async getAllQuotes(): Promise<Quote[]> {
-    await latency();
     return allQuotes();
   },
 
   async getIndices(): Promise<Quote[]> {
-    await latency();
     return indexQuotes();
   },
 
   async getCompanies(): Promise<Company[]> {
-    await latency();
     return MOCK_UNIVERSE;
   },
 };
