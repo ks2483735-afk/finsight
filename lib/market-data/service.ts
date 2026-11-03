@@ -138,14 +138,12 @@ export const marketDataService = {
             for (const quote of result.quotes) {
               collected.set(quote.symbol.toUpperCase(), quote);
             }
-            if (result.quotes.length > 0) {
-              sources.push({
-                providerId: fallback.id,
-                label: fallback.label,
-                isMock: true,
-                degraded: liveMarketAdapters().length > 0,
-              });
-            }
+            sources.push({
+              providerId: fallback.id,
+              label: fallback.label,
+              isMock: true,
+              degraded: liveMarketAdapters().length > 0,
+            });
             remaining = remaining.filter((symbol) => !collected.has(symbol));
           } catch {
             // Return partial results and report unresolved symbols below.
@@ -196,7 +194,7 @@ export const marketDataService = {
           providerId: fallback.id,
           label: fallback.label,
           isMock: true,
-          degraded: liveMarketAdapters().length > 0,
+          degraded: false,
         },
       };
     });
