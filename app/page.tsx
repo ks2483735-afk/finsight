@@ -16,6 +16,22 @@ import { formatPrice } from "@/lib/format";
 import { generateSeries } from "@/lib/mock/series";
 import { MOCK_INDICES } from "@/lib/mock/companies";
 
+// The landing-page preview is intentionally simulated; never call a market API here.
+export const dynamic = "force-dynamic";
+
+const previewIndices = MOCK_INDICES.slice(0, 6).map((index) => {
+  // Keep movements small and plausible while making each page request visibly different.
+  const price = index.price * (1 + (Math.random() - 0.5) * 0.012);
+  const changePercent = (Math.random() - 0.5) * 1.8;
+  return {
+    ...index,
+    price,
+    changePercent,
+    change: (price * changePercent) / 100,
+  };
+});
+const previewSeed = Math.random().toString(36).slice(2);
+
 const FEATURES = [
   {
     icon: HardDrive,
@@ -159,11 +175,12 @@ export default function LandingPage() {
             </div>
 
             <div className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
-              {MOCK_INDICES.slice(0, 6).map((index) => {
-                const series = generateSeries(`landing-${index.symbol}`, {
+              {previewIndices.map((index) => {
+                const series = generateSeries(`landing-${index.symbol}-${previewSeed}`, {
                   points: 28,
                   endValue: index.price,
                   trend: index.changePercent / 100,
+                  volatility: 0.012,
                 });
                 return (
                   <div
@@ -188,8 +205,7 @@ export default function LandingPage() {
             </div>
 
             <div className="border-t border-border px-4 py-2.5 text-2xs text-faint">
-              Demo data rendered through the provider pipeline — every payload carries its
-              source label.
+              Simulated mock snapshot — regenerated on each page load. These are not real-time market quotes.
             </div>
           </div>
         </div>
