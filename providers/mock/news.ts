@@ -1,12 +1,11 @@
-/** Mock news adapter (DEMO STORIES ONLY) — see lib/mock/news.ts. */
+/**
+ * Mock news adapter (DEMO STORIES ONLY) — see lib/mock/news.ts.
+ * Local demo stories are returned immediately; artificial wait time is not
+ * needed to demonstrate loading states in production.
+ */
 
 import type { NewsProvider, NewsQuery, NewsStory } from "@/lib/news/types";
 import { MOCK_STORIES } from "@/lib/mock/news";
-
-const SIMULATED_LATENCY_MS = 200;
-
-const latency = () =>
-  new Promise<void>((resolve) => setTimeout(resolve, SIMULATED_LATENCY_MS));
 
 export const mockNewsProvider: NewsProvider = {
   id: "mock",
@@ -14,7 +13,6 @@ export const mockNewsProvider: NewsProvider = {
   isMock: true,
 
   async getStories(query: NewsQuery = {}): Promise<NewsStory[]> {
-    await latency();
     let stories = [...MOCK_STORIES];
 
     if (query.category && query.category !== "All") {

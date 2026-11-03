@@ -1,24 +1,53 @@
 /**
- * Market-data service — the ONLY thing the API layer calls.
+ * Market-data service — the only layer API routes call.
  *
- * Implements the spec §23 fallback chain:
- *   preferred configured provider → fallback provider → demo data →
- *   clear "unavailable" message.
- *
- * Live adapters are tried in registration order. If all live providers fail,
- * the service falls back to the mock adapter with source.isMock = true and
- * source.degraded = true — the UI surfaces the degraded state honestly.
+ * Live providers are used only when enabled and configured. Symbol lookups
+ * can combine provider coverage (for example, Finnhub US + Alpha Vantage India)
+ * before filling any remaining symbols with clearly labeled demo quotes.
  */
 
 import { initializeProviders } from "@/providers";
 import { getRegistry } from "@/lib/providers/registry";
+import { getKeyStatus, isProviderEnabled } from "@/lib/providers/config";
 import { cached, CACHE_TTL } from "@/lib/cache/ttl";
-import type { Fundamentals, HistoryRange, MarketDataProvider, Company, Movers, PricePoint, Quote, QuoteBatch } from "@/lib/market-data/types";
+import type {
+  Fundamentals,
+  HistoryRange,
+  MarketDataProvider,
+  Company,
+  Movers,
+  PricePoint,
+  Quote,
+  QuoteBatch,
+} from "@/lib/market-data/types";
 import type { DataSourceInfo } from "@/lib/providers/types";
 
 export interface Served<T> {
   data: T;
   source: DataSourceInfo;
+}
+
+function liveMarketAdapters(): MarketDataProvider[] {
+  initializeProviders();
+  const registry = getRegistry();
+  return registry.listMarketAdapters().filter((adapter) => {
+    const descriptor = registry.getDescriptor(adapter.id);
+    if (!descriptor || !descriptor.adapterImplemented) return false;
+    return isProviderEnabled(adapter.id) && getKeyStatus(descriptor).configured;
+  });
+}
+
+function combineSources(sources: DataSourceInfo[]): DataSourceInfo {
+  const unique = Array.from(
+    new Map(sources.map((source) => [source.providerId, source])).values(),
+  );
+  if (unique.length === 1) return unique[0];
+  return {
+    providerId: "mixed",
+    label: unique.map((source) => source.label).join(" + "),
+    isMock: unique.some((source) => source.isMock),
+    degraded: unique.some((source) => source.degraded || source.isMock),
+  };
 }
 
 async function resolveMarket<T>(
@@ -27,21 +56,23 @@ async function resolveMarket<T>(
   initializeProviders();
   const registry = getRegistry();
 
-  // 1) Live adapters in registration order.
-  for (const adapter of registry.listMarketAdapters()) {
+  for (const adapter of liveMarketAdapters()) {
     try {
       const data = await run(adapter);
       return {
         data,
-        source: { providerId: adapter.id, label: adapter.label, isMock: false, degraded: false },
+        source: {
+          providerId: adapter.id,
+          label: adapter.label,
+          isMock: false,
+          degraded: false,
+        },
       };
     } catch {
-      // Provider failed or out of quota → try the next one.
-      continue;
+      // Provider failed or does not support this operation; try the next.
     }
   }
 
-  // 2) Demo fallback (always available, always labeled).
   const fallback = registry.fallbackMarket;
   if (!fallback) {
     throw new Error("No market-data provider is available. Add a key in Settings.");
@@ -53,119 +84,116 @@ async function resolveMarket<T>(
       providerId: fallback.id,
       label: fallback.label,
       isMock: true,
-      degraded: registry.hasLiveMarketData,
+      degraded: liveMarketAdapters().length > 0,
     },
   };
 }
 
+export const marketDataService = {
+  getQuotes(symbols: string[]): Promise<Served<QuoteBatch>> {
+    const normalized = Array.from(
+      new Set(symbols.map((symbol) => symbol.trim().toUpperCase()).filter(Boolean)),
+    ).sort();
+    const key = `mq:${normalized.join(",")}`;
 
-const LIVE_UNIVERSE = [
-  "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "AVGO",
-  "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK", "ITC", "SBIN",
-  "TATAMOTORS", "HINDUNILVR", "BAJFINANCE", "NIFTYBEES",
-];
+    return cached(key, CACHE_TTL.price, async () => {
+      initializeProviders();
+      const registry = getRegistry();
+      const collected = new Map<string, Quote>();
+      const sources: DataSourceInfo[] = [];
+      let remaining = [...normalized];
 
-async function getLiveUniverseQuotes(): Promise<Served<Quote[]> | null> {
-  initializeProviders();
-  const registry = getRegistry();
+      // Providers can cover different exchanges. Keep successful quotes and
+      // pass only unresolved symbols to the next provider instead of discarding
+      // the entire batch when one symbol is unsupported.
+      for (const adapter of liveMarketAdapters()) {
+        if (remaining.length === 0) break;
+        try {
+          const result = await adapter.getQuotes(remaining);
+          for (const quote of result.quotes) {
+            collected.set(quote.symbol.toUpperCase(), quote);
+          }
+          if (result.quotes.length > 0) {
+            sources.push({
+              providerId: adapter.id,
+              label: adapter.label,
+              isMock: false,
+              degraded: false,
+            });
+          }
+          remaining = remaining.filter((symbol) => !collected.has(symbol));
+        } catch {
+          // Try the next provider with the same unresolved symbol set.
+        }
+      }
 
-  for (const adapter of registry.listMarketAdapters()) {
-    try {
-      const data = await adapter.getQuotes(LIVE_UNIVERSE);
-      if (data.quotes?.length) {
+      if (remaining.length > 0) {
+        const fallback = registry.fallbackMarket;
+        if (fallback) {
+          try {
+            const result = await fallback.getQuotes(remaining);
+            for (const quote of result.quotes) {
+              collected.set(quote.symbol.toUpperCase(), quote);
+            }
+            sources.push({
+              providerId: fallback.id,
+              label: fallback.label,
+              isMock: true,
+              degraded: liveMarketAdapters().length > 0,
+            });
+            remaining = remaining.filter((symbol) => !collected.has(symbol));
+          } catch {
+            // Return partial results and report unresolved symbols below.
+          }
+        }
+      }
+
+      const quotes = normalized
+        .map((symbol) => collected.get(symbol))
+        .filter((quote): quote is Quote => Boolean(quote));
+
+      if (sources.length === 0) {
+        const fallback = registry.fallbackMarket;
+        if (!fallback) throw new Error("No market-data provider is available.");
+        const result = await fallback.getQuotes(normalized);
         return {
-          data: data.quotes,
+          data: result,
           source: {
-            providerId: adapter.id,
-            label: adapter.label,
-            isMock: false,
-            degraded: false,
+            providerId: fallback.id,
+            label: fallback.label,
+            isMock: true,
+            degraded: liveMarketAdapters().length > 0,
           },
         };
       }
-    } catch {
-      continue;
-    }
-  }
 
-  return null;
-}
-async function getLiveCompanies(): Promise<Served<Company[]> | null> {
-  initializeProviders();
-  const registry = getRegistry();
-  const fallback = registry.fallbackMarket;
-  if (!fallback) return null;
-
-  const [metadata, quotes] = await Promise.all([
-    fallback.getCompanies(),
-    getLiveUniverseQuotes(),
-  ]);
-  if (!quotes?.data.length) return null;
-
-  const bySymbol = new Map(quotes.data.map((quote) => [quote.symbol, quote]));
-  const companies: Company[] = [];
-  const sources: DataSourceInfo[] = [];
-
-  for (const adapter of registry.listMarketAdapters()) {
-    if (!adapter.getFundamentals) continue;
-    for (const company of metadata) {
-      if (!bySymbol.has(company.symbol)) continue;
-      try {
-        const fundamentals = await adapter.getFundamentals(company.symbol);
-        const quote = bySymbol.get(company.symbol)!;
-        companies.push({
-          ...company,
-          price: quote.price,
-          change: quote.change,
-          changePercent: quote.changePercent,
-          marketCap: fundamentals.marketCap || company.marketCap,
-          pe: fundamentals.pe || company.pe,
-          ps: fundamentals.ps || company.ps,
-          pb: fundamentals.pb || company.pb,
-          roe: fundamentals.roe || company.roe,
-          epsGrowth: fundamentals.epsGrowth || company.epsGrowth,
-          revenueGrowth: fundamentals.revenueGrowth || company.revenueGrowth,
-          dividendYield: fundamentals.dividendYield || company.dividendYield,
-          debtToEquity: fundamentals.debtToEquity || company.debtToEquity,
-          week52High: fundamentals.week52High || company.week52High,
-          week52Low: fundamentals.week52Low || company.week52Low,
-        });
-        sources.push({
-          providerId: adapter.id,
-          label: adapter.label,
-          isMock: false,
-          degraded: false,
-        });
-      } catch {
-        // Try the next live fundamentals provider for this company.
-      }
-    }
-  }
-
-  if (!companies.length) return null;
-  const unique = Array.from(new Map(companies.map((company) => [company.symbol, company])).values());
-  const source = sources.length === 1 ? sources[0] : {
-    providerId: "mixed",
-    label: Array.from(new Set(sources.map((item) => item.label))).join(" + "),
-    isMock: false,
-    degraded: false,
-  };
-  return { data: unique, source };
-}
-
-export const marketDataService = {
-  getQuotes(symbols: string[]): Promise<Served<QuoteBatch>> {
-    const key = `mq:${[...symbols].map((s) => s.toUpperCase()).sort().join(",")}`;
-    return cached(key, CACHE_TTL.price, () =>
-      resolveMarket((adapter) => adapter.getQuotes(symbols)),
-    );
+      return {
+        data: { quotes, missing: remaining },
+        source: combineSources(sources),
+      };
+    });
   },
 
-  async getAllQuotes(): Promise<Served<Quote[]>> {
+  /**
+   * The providers in this release do not offer a bulk-universe endpoint.
+   * Keep the broad Markets grid and movers demo-backed rather than issuing
+   * dozens of individual requests and exhausting free API quotas.
+   */
+  getAllQuotes(): Promise<Served<Quote[]>> {
     return cached("mq:all", CACHE_TTL.price, async () => {
-      const live = await getLiveUniverseQuotes();
-      if (live) return live;
-      return resolveMarket((adapter) => adapter.getAllQuotes());
+      initializeProviders();
+      const registry = getRegistry();
+      const fallback = registry.fallbackMarket;
+      if (!fallback) throw new Error("No market-data provider is available.");
+      return {
+        data: await fallback.getAllQuotes(),
+        source: {
+          providerId: fallback.id,
+          label: fallback.label,
+          isMock: true,
+          degraded: false,
+        },
+      };
     });
   },
 
@@ -177,10 +205,9 @@ export const marketDataService = {
 
   async getFundamentals(symbol: string): Promise<Served<Fundamentals>> {
     initializeProviders();
-    const registry = getRegistry();
     const normalized = symbol.trim().toUpperCase();
 
-    for (const adapter of registry.listMarketAdapters()) {
+    for (const adapter of liveMarketAdapters()) {
       if (!adapter.getFundamentals) continue;
       try {
         const data = await adapter.getFundamentals(normalized);
@@ -194,7 +221,7 @@ export const marketDataService = {
           },
         };
       } catch {
-        continue;
+        // Try the next configured provider.
       }
     }
 
@@ -207,23 +234,26 @@ export const marketDataService = {
     );
   },
 
-
   async getHistory(symbol: string, range: HistoryRange): Promise<Served<PricePoint[]>> {
     initializeProviders();
-    const registry = getRegistry();
     const normalized = symbol.trim().toUpperCase();
-    for (const adapter of registry.listMarketAdapters()) {
+    for (const adapter of liveMarketAdapters()) {
       if (!adapter.getHistory) continue;
       try {
         const data = await adapter.getHistory(normalized, range);
         if (data.length > 1) {
           return {
             data,
-            source: { providerId: adapter.id, label: adapter.label, isMock: false, degraded: false },
+            source: {
+              providerId: adapter.id,
+              label: adapter.label,
+              isMock: false,
+              degraded: false,
+            },
           };
         }
       } catch {
-        // Try the next live provider.
+        // Try the next configured provider.
       }
     }
     throw new Error(`No live price history is available for ${normalized}.`);
@@ -243,4 +273,3 @@ export const marketDataService = {
     };
   },
 };
-

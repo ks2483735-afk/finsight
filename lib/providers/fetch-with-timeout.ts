@@ -5,7 +5,7 @@
 export async function fetchWithTimeout(
   input: RequestInfo | URL,
   init: RequestInit = {},
-  timeoutMs = 8_000,
+  timeoutMs = 5_000,
 ): Promise<Response> {
   try {
     return await fetch(input, {

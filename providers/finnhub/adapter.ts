@@ -24,6 +24,28 @@ type FinnhubQuote = {
   t?: number;
 };
 
+/** Run several independent quotes concurrently without flooding the provider. */
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  concurrency: number,
+  mapper: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let cursor = 0;
+  const workers = Array.from(
+    { length: Math.min(Math.max(1, concurrency), items.length) },
+    async () => {
+      while (true) {
+        const index = cursor++;
+        if (index >= items.length) return;
+        results[index] = await mapper(items[index]);
+      }
+    },
+  );
+  await Promise.all(workers);
+  return results;
+}
+
 function apiKey(): string {
   const key = envKey({
     id: "finnhub", name: "Finnhub", kind: "market-data",
@@ -141,23 +163,25 @@ export const finnhubProvider: MarketDataProvider = {
   isMock: false,
 
   async getQuotes(symbols: string[]): Promise<QuoteBatch> {
-    const normalized = symbols.map((s) => s.trim().toUpperCase()).filter(Boolean);
-    // Finnhub's documented real-time quote endpoint is for US stocks.
-    if (normalized.some((symbol) => INDIAN_SYMBOLS.has(symbol))) {
-      throw new Error("Finnhub real-time adapter currently targets US equities.");
-    }
-
-    const quotes: Quote[] = [];
-    const missing: string[] = [];
-    for (const symbol of normalized) {
+    const normalized = Array.from(
+      new Set(symbols.map((s) => s.trim().toUpperCase()).filter(Boolean)),
+    );
+    // Finnhub's quote endpoint covers US equities. Return those quotes and
+    // leave unsupported Indian symbols for the next provider in the chain.
+    const supported = normalized.filter((symbol) => !INDIAN_SYMBOLS.has(symbol));
+    const missing = normalized.filter((symbol) => INDIAN_SYMBOLS.has(symbol));
+    const results = await mapWithConcurrency(supported, 4, async (symbol) => {
       try {
-        quotes.push(normalize(symbol, await request(symbol)));
+        return normalize(symbol, await request(symbol));
       } catch {
-        missing.push(symbol);
+        return null;
       }
+    });
+    const quotes = results.filter((quote): quote is Quote => quote !== null);
+    const returned = new Set(quotes.map((quote) => quote.symbol));
+    for (const symbol of supported) {
+      if (!returned.has(symbol)) missing.push(symbol);
     }
-
-    if (!quotes.length) throw new Error("Finnhub returned no usable quotes.");
     return { quotes, missing };
   },
 
@@ -166,21 +190,21 @@ export const finnhubProvider: MarketDataProvider = {
   },
 
   async getIndices(): Promise<Quote[]> {
-    const quotes: Quote[] = [];
-    for (const index of INDEX_UNIVERSE) {
-      try {
+    const results = await Promise.allSettled(
+      INDEX_UNIVERSE.map(async (index) => {
         const quote = await request(index.symbol);
-        quotes.push({
+        return {
           ...normalize(index.symbol, quote),
           name: index.name,
           region: index.region,
           currency: index.currency,
           exchange: index.region === "IN" ? "INDEX-IN" : "INDEX-US",
-        });
-      } catch {
-        // Continue so one unsupported index does not hide the rest.
-      }
-    }
+        };
+      }),
+    );
+    const quotes = results.flatMap((result) =>
+      result.status === "fulfilled" ? [result.value] : [],
+    );
     if (!quotes.length) throw new Error("Finnhub returned no supported index quotes.");
     return quotes;
   },
