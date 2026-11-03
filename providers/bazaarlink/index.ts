@@ -1,6 +1,6 @@
 import type { ProviderDescriptor } from "@/lib/providers/types";
 
-/** BazaarLink — descriptor only. The real adapter ships in v0.3. */
+/** BazaarLink — descriptor only. The real adapter ships in v0.5. */
 export const bazaarlinkDescriptor: ProviderDescriptor = {
   id: "bazaarlink",
   name: "BazaarLink",
@@ -9,7 +9,7 @@ export const bazaarlinkDescriptor: ProviderDescriptor = {
   docsUrl: "https://bazaarlink.ai/en/docs",
   keyUrl: "https://bazaarlink.ai/free",
   adapterImplemented: false,
-  plannedIn: "v0.3",
+  plannedIn: "v0.5",
   description:
     "OpenAI-compatible gateway to hundreds of models (incl. a free tier).",
 };
