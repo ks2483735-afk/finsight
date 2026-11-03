@@ -32,11 +32,8 @@ function liveMarketAdapters(): MarketDataProvider[] {
   const registry = getRegistry();
   return registry.listMarketAdapters().filter((adapter) => {
     const descriptor = registry.getDescriptor(adapter.id);
-    return Boolean(
-      descriptor?.adapterImplemented &&
-        isProviderEnabled(adapter.id) &&
-        getKeyStatus(descriptor).configured,
-    );
+    if (!descriptor || !descriptor.adapterImplemented) return false;
+    return isProviderEnabled(adapter.id) && getKeyStatus(descriptor).configured;
   });
 }
 
