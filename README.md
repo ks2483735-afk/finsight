@@ -8,6 +8,8 @@
 
 **Live web app:** [https://finsight-psi-gold.vercel.app](https://finsight-psi-gold.vercel.app)
 
+> **Mobile support:** FinSight is currently designed primarily for desktop screens and is **not yet optimized for mobile devices**. Some pages and controls may be difficult to use on smaller screens.
+
 Ask a financial question → FinSight retrieves market and news evidence → your selected AI provider interprets it → you get an answer with sources. Evidence and AI interpretation are always kept clearly separate.
 
 > **Status: v0.3.0 — Performance & Reliability.** Builds on the live-data foundation with improved request deduplication and caching, provider request timeouts, refreshed UI screenshots, and README updates. Live market data is available through Finnhub and Alpha Vantage, with news ingestion through public RSS feeds. AI interpretation is still planned and is not included in this release. FinSight never presents demo data as live data.
