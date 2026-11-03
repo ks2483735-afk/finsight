@@ -317,7 +317,7 @@ export default function SettingsPage() {
     <div className="max-w-5xl">
       <PageHeader
         title="Settings"
-        description="Bring your own keys, local storage, and app information. Keys never leave this machine."
+        description="Manage provider integrations and local data. Public deployments restrict personal-data features until account isolation is available."
         actions={
           <div className="flex gap-1.5">
             {tabs.map((t) => (
@@ -384,10 +384,10 @@ export default function SettingsPage() {
                     <CardTitle>{KIND_LABELS[kind]}</CardTitle>
                     <CardDescription>
                       {kind === "ai"
-                        ? "Used by the AI router (adapters in v0.3)"
+                        ? "AI-generated financial interpretation is planned; provider adapters are not implemented yet."
                         : kind === "market-data"
-                          ? "Quotes, fundamentals, filings (adapters in v0.2)"
-                          : "Headlines and clustering (adapters in v0.4)"}
+                          ? "Live quotes via Finnhub and Alpha Vantage; broader fundamentals and filings are still in progress."
+                          : "Live headlines via public RSS feeds and NewsAPI; clustering and richer news intelligence are planned."}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -517,11 +517,11 @@ export default function SettingsPage() {
             <CardContent>
               <dl className="grid gap-3 sm:grid-cols-2">
                 {[
-                  ["Release", `v${APP_VERSION} — Foundation (Phase 0)`],
-                  ["Mode", "Demo data (mock providers) until live adapters land"],
+                  ["Release", `v${APP_VERSION} — Performance & Reliability`],
+                  ["Mode", "Local-first BYOK; live data when configured, with clearly labeled demo fallback"],
                   ["License", "MIT — open source"],
                   ["Stack", "Next.js · React · TypeScript · Tailwind CSS"],
-                  ["Database", "SQLite via Node's built-in node:sqlite"],
+                  ["Database", "Local SQLite; personal-data APIs are disabled on public hosts"],
                   ["Architecture", "UI → services → provider registry → adapters"],
                 ].map(([label, value]) => (
                   <div key={label} className="rounded-md border border-border bg-background px-3 py-2.5">
@@ -540,12 +540,11 @@ export default function SettingsPage() {
             <CardContent>
               <ul className="space-y-2 text-xs text-secondary">
                 {[
-                  ["v0.2", "Market data adapters (Alpha Vantage, Finnhub) + company pages"],
-                  ["v0.3", "AI router, research agent, citations"],
-                  ["v0.4", "News intelligence: RSS/API, clustering, daily brief"],
-                  ["v0.5", "Fundamentals, filings, earnings, comparison"],
-                  ["v0.6", "Portfolio & watchlist polish"],
-                  ["v0.7", "Alert evaluation + notifications"],
+                  ["Current", "v0.3.0 — live market quotes, RSS/NewsAPI news, caching, and provider timeouts"],
+                  ["Next", "Gemini AI integration, financial interpretation, and sourced answers"],
+                  ["Following", "Expanded news intelligence, clustering, and additional integrations"],
+                  ["v0.5", "Earnings, company events, and SEC/MCA filings"],
+                  ["v0.7", "Alert evaluation and notifications"],
                 ].map(([version, item]) => (
                   <li key={version} className="flex gap-3">
                     <span className="mono w-10 shrink-0 text-accent">{version}</span>
