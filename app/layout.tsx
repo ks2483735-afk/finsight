@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s · FinSight",
   },
   description:
-    "FinSight is a local-first, BYOK finance research terminal. Provider-independent market data, news, and AI research with your own API keys.",
+    "FinSight is a local-first, BYOK finance research terminal for market data, news, and evidence-based research. AI-generated financial interpretation is planned.",
   applicationName: "FinSight",
   keywords: [
     "finance",
