@@ -157,12 +157,22 @@ export const alphaVantageProvider: MarketDataProvider = {
     const quotes: Quote[] = [];
     const missing: string[] = [];
 
-    // Keep requests sequentially to be gentle with provider quotas.
-    for (const symbol of normalized) {
-      try {
-        quotes.push(normalize(symbol, await request(alphaSymbol(symbol))));
-      } catch {
-        missing.push(symbol);
+    // A small concurrency of two reduces latency for mixed-provider lookups
+    // without launching a large burst against a quota-limited free API.
+    for (let i = 0; i < normalized.length; i += 2) {
+      const batch = normalized.slice(i, i + 2);
+      const results = await Promise.all(
+        batch.map(async (symbol) => {
+          try {
+            return { symbol, quote: normalize(symbol, await request(alphaSymbol(symbol))) };
+          } catch {
+            return { symbol, quote: null };
+          }
+        }),
+      );
+      for (const result of results) {
+        if (result.quote) quotes.push(result.quote);
+        else missing.push(result.symbol);
       }
     }
 
