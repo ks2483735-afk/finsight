@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
  * GET /api/research?q=why%20is%20nvda%20up
  *
  * Returns evidence collected through internal services plus an honest AI
- * status. No model call is made in v0.1 (adapters arrive in v0.3).
+ * status. No model call is made yet; the first AI adapter is planned for v0.5.
  */
 export async function GET(req: Request) {
   try {
