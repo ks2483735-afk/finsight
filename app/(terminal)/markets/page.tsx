@@ -118,7 +118,7 @@ export default function MarketsPage() {
     <div>
       <PageHeader
         title="Markets"
-        description="Indices, equities, and ETFs across US and Indian exchanges — served through the market-data provider pipeline."
+        description="Live index quotes when supported; the broad stock and ETF universe stays clearly labeled demo data to avoid slow, quota-heavy per-symbol bulk requests."
         actions={
           <>
             {quotes.data ? <DataSourceChip source={quotes.data.source} /> : null}
@@ -236,8 +236,7 @@ export default function MarketsPage() {
       </div>
 
       <p className={cn("mt-4 text-2xs text-faint")}>
-        Equity quotes use configured live providers when available. Indices and unsupported
-        operations may still use demo data until their dedicated adapters ship.
+        The broad equity and ETF universe uses simulated demo quotes. Open a company to request a live quote from your configured providers; index coverage depends on provider support.
       </p>
     </div>
   );
