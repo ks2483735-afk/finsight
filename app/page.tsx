@@ -226,7 +226,7 @@ export default function LandingPage() {
               FinSight runs on a laptop. Clone, install, and start — it works with{" "}
               <span className="text-foreground">zero keys</span> in demo mode. Add provider
               keys later in <span className="text-foreground">Settings → Providers</span> to
-              unlock live data, news, and AI research.
+              unlock supported live market data and news. AI interpretation is planned for a future release.
             </p>
             <Link
               href="/overview"
