@@ -6,7 +6,7 @@
 
 **Latest stable release:** [v0.3.0 — Performance & Reliability](https://github.com/ks2483735-afk/finsight/releases/tag/v0.3.0)
 
-**Next release candidate:** [v0.4.0 — Performance & Reliability](https://github.com/ks2483735-afk/finsight/pull/8)
+**Next release candidate:** [v0.4.0 — Performance & Reliability](https://github.com/ks2483735-afk/finsight/pull/10)
 
 **Live web app:** [https://finsight-psi-gold.vercel.app](https://finsight-psi-gold.vercel.app)
 
