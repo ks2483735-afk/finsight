@@ -29,7 +29,7 @@ export const rssProvider: NewsProvider = {
 
   async getStories(query = {}): Promise<NewsStory[]> {
     const feed = FEEDS.find((item) => query.category === item.category) ?? FEEDS[0];
-    const response = await fetchWithTimeout(feed.url, { cache: "no-store" });
+    const response = await fetchWithTimeout(feed.url, { cache: "no-store" }, 4000);
     if (!response.ok) throw new Error("RSS HTTP " + response.status);
     const xml = await response.text();
     const items = xml.match(/<item>[\s\S]*?<\/item>/gi) ?? [];
