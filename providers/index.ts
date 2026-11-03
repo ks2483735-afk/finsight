@@ -56,7 +56,8 @@ export function initializeProviders(): void {
   // v0.2 live market adapters.
   registry.registerMarketAdapter(finnhubProvider);
   registry.registerMarketAdapter(alphaVantageProvider);
-  registry.registerNewsAdapter(rssProvider);
+  // Prefer configured NewsAPI; public RSS remains the zero-key fallback.
   registry.registerNewsAdapter(newsApiProvider);
+  registry.registerNewsAdapter(rssProvider);
   globalRef.__finsightProvidersReady = true;
 }
