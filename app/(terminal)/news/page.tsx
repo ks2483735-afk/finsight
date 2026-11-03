@@ -47,11 +47,10 @@ export default function NewsPage() {
     <div>
       <PageHeader
         title="News"
-        description="Finance-focused story feed with clustering — one event, multiple sources. Demo stories until v0.4 wires live providers."
+        description="Finance-focused headlines from configured NewsAPI or public RSS feeds. Stories are shown individually; multi-source clustering is not implemented yet."
         actions={
           <>
-            <MockBadge />
-            {data && <DataSourceChip source={data.source} />}
+            {data && (data.source.isMock ? <MockBadge /> : <DataSourceChip source={data.source} />)}
             <Button variant="outline" size="sm" onClick={refetch} loading={loading}>
               <RefreshCw className="h-3.5 w-3.5" aria-hidden />
               Refresh
