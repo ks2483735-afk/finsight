@@ -1,6 +1,6 @@
 {
   "title": "FinSight",
-  "description": "Open-source AI financial research terminal with real-time market data, news intelligence, and multi-provider AI.",
+  "description": "Open-source finance research terminal with live market and news providers, clearly labeled demo fallbacks, and a local-first design.",
   "links": [
     {
       "title": "FinSight",
