@@ -4,15 +4,17 @@
 
 [![Latest Release](https://img.shields.io/github/v/release/ks2483735-afk/finsight?display_name=tag&sort=semver)](https://github.com/ks2483735-afk/finsight/releases) [![License](https://img.shields.io/github/license/ks2483735-afk/finsight)](https://github.com/ks2483735-afk/finsight/blob/main/LICENSE)
 
-**Latest release:** [v0.3.0 — Performance & Reliability](https://github.com/ks2483735-afk/finsight/releases/tag/v0.3.0)
+**Latest stable release:** [v0.3.0 — Performance & Reliability](https://github.com/ks2483735-afk/finsight/releases/tag/v0.3.0)
+
+**Next release candidate:** [v0.4.0 — Performance & Reliability](https://github.com/ks2483735-afk/finsight/pull/8)
 
 **Live web app:** [https://finsight-psi-gold.vercel.app](https://finsight-psi-gold.vercel.app)
 
 > **Mobile support:** FinSight is currently designed primarily for desktop screens and is **not yet optimized for mobile devices**. Some pages and controls may be difficult to use on smaller screens.
 
-Ask a financial question → FinSight retrieves market and news evidence → your selected AI provider interprets it → you get an answer with sources. Evidence and AI interpretation are always kept clearly separate.
+FinSight is an open-source finance research terminal for exploring market data, news, and company context. Live quotes and headlines use configured providers where supported; unsupported data remains clearly labeled as demo data. AI-generated financial interpretation is still in development.
 
-> **Status: v0.3.0 — Performance & Reliability.** Builds on the live-data foundation with improved request deduplication and caching, provider request timeouts, refreshed UI screenshots, and README updates. Live market data is available through Finnhub and Alpha Vantage, with news ingestion through public RSS feeds. AI interpretation is still planned and is not included in this release. FinSight never presents demo data as live data.
+> **Release candidate: v0.4.0 — Performance & Reliability.** This update focuses on faster provider routing, fewer unnecessary upstream calls, concurrent supported requests, shorter provider timeouts, zero artificial delays in local mock fallbacks, and static delivery of the landing page. It does not add AI answers or make the broad demo market universe live. The current stable release remains v0.3.0 until v0.4.0 is published.
 
 ---
 
@@ -28,7 +30,11 @@ Ask a financial question → FinSight retrieves market and news evidence → you
 
 ---
 
-## What works today (v0.3.0)
+## Performance notes
+
+FinSight prioritizes honest data and predictable provider behavior over pretending every screen is live. The current adapters do not provide a single bulk endpoint for the entire demo universe, so the broad market table and movers remain mock/demo data. Individual company quote lookups and supported indices can use configured live providers. See the v0.4.0 release-candidate notes below.
+
+## What works today (v0.4.0 release candidate)
 
 | Area | State |
 | --- | --- |
@@ -41,14 +47,15 @@ Ask a financial question → FinSight retrieves market and news evidence → you
 | Calculators (SIP, Lumpsum, CAGR, Compound, EMI, Dividend) | ✅ deterministic |
 | BYOK Settings (store keys, enable/disable, honest connection tests) | ✅ |
 | Provider architecture (interfaces, registry, fallback chain, TTL cache and request deduplication) | ✅ |
+| Performance improvements (bounded provider calls, supported concurrency, instant mock fallbacks, static landing page) | ✅ v0.4.0 |
 | Finnhub live market-data adapter | ✅ |
 | Alpha Vantage live market-data adapter | ✅ |
 | Public RSS news adapter (no API key required) | ✅ |
 | NewsAPI adapter | ✅ available; requires a NewsAPI key |
 | Google Gemini adapter | ⏳ Planned — not implemented |
 | AI answers / citations | ⏳ Planned — not implemented |
-| Earnings/events and SEC/MCA filings ingestion | ⏳ v0.5 |
-| Alert evaluation & notifications | ⏳ v0.7 |
+| Earnings/events and SEC/MCA filings ingestion | ⏳ v0.7 |
+| Alert evaluation & notifications | ⏳ v0.8 |
 
 ## Pinokio
 
@@ -174,18 +181,30 @@ finsight/
 └── package.json
 ```
 
-## v0.3.0 verification
+## v0.4.0 performance updates
 
-The v0.3.0 code on `main` was verified with:
+The v0.4.0 release candidate includes:
 
-- `npm run typecheck` passing
-- `npm run build` passing (optimized production build)
-- Request deduplication and TTL cache improvements
-- 8-second abort timeouts for supported external data-provider requests
-- Updated landing-page and overview-dashboard screenshots
-- No API keys committed to the repository
+- The broad Markets universe and movers stay explicitly demo-backed instead of triggering unsupported per-symbol bulk requests against quota-limited providers.
+- Individual quote lookups can combine successful provider coverage, so one provider's unsupported symbols do not discard quotes returned by another.
+- Finnhub quote requests use bounded concurrency, and supported index requests run concurrently.
+- Alpha Vantage requests are processed in small batches to reduce latency without creating an uncontrolled request burst.
+- Disabled or unconfigured live providers are skipped before requests are made.
+- Configured NewsAPI is preferred; public RSS remains the no-key fallback.
+- External provider requests use bounded timeouts, and local mock market/news data no longer adds artificial waiting time.
+- The landing page is statically prerendered; its clearly labeled simulated market preview updates in the browser.
+
+### Release-candidate verification
+
+- The performance branch's Vercel preview build completed successfully with TypeScript validation and all 16 static pages generated.
+- The landing route was reported as static in the build output.
+- Run `npm run typecheck`, `npm run build`, and `npm run smoke` locally against the final release-candidate commit before publishing the release.
+- No before/after runtime benchmark has been recorded yet, so this release does not claim a specific percentage or millisecond speed improvement.
+- No API keys are committed to the repository.
 
 Live-provider behavior still depends on your own provider keys, quotas, and network availability.
+
+See [CHANGELOG.md](CHANGELOG.md) for the release-by-release change log.
 
 ## Verification
 
@@ -217,10 +236,10 @@ Run FinSight on your own computer to use personal data and save provider keys. D
 
 ## Roadmap
 
-- **Next** — AI-powered financial interpretation and sourced AI answers
-- **Following** — Expanded news intelligence and additional news integrations
-- **v0.5** — Earnings, company events, and SEC/MCA filings
-- **v0.7** — Alert evaluation and notifications
+- **v0.5** — Gemini AI integration, financial interpretation, and sourced answers
+- **v0.6** — Expanded news intelligence, clustering, and richer daily briefs
+- **v0.7** — Earnings, company events, and SEC/MCA filings
+- **v0.8** — Alert evaluation and notifications
 
 ## Contributing
 
