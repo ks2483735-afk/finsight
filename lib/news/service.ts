@@ -5,6 +5,7 @@
 
 import { initializeProviders } from "@/providers";
 import { getRegistry } from "@/lib/providers/registry";
+import { getKeyStatus, isProviderEnabled } from "@/lib/providers/config";
 import { cached, CACHE_TTL } from "@/lib/cache/ttl";
 import type { NewsProvider, NewsQuery, NewsStory } from "@/lib/news/types";
 import type { DataSourceInfo } from "@/lib/providers/types";
@@ -21,6 +22,14 @@ async function resolveNews(
   const registry = getRegistry();
 
   for (const adapter of registry.listNewsAdapters()) {
+    const descriptor = registry.getDescriptor(adapter.id);
+    if (
+      !descriptor?.adapterImplemented ||
+      !isProviderEnabled(adapter.id) ||
+      !getKeyStatus(descriptor).configured
+    ) {
+      continue;
+    }
     try {
       const data = await run(adapter);
       return {
