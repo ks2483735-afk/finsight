@@ -1,6 +1,6 @@
 import type { ProviderDescriptor } from "@/lib/providers/types";
 
-/** Google Gemini — descriptor only. The real adapter ships in v0.3. */
+/** Google Gemini — descriptor only. The real adapter ships in v0.5. */
 export const geminiDescriptor: ProviderDescriptor = {
   id: "gemini",
   name: "Google Gemini",
@@ -9,6 +9,6 @@ export const geminiDescriptor: ProviderDescriptor = {
   docsUrl: "https://ai.google.dev/gemini-api/docs",
   keyUrl: "https://aistudio.google.com/apikey",
   adapterImplemented: false,
-  plannedIn: "v0.3",
+  plannedIn: "v0.5",
   description: "Google's Gemini models, reached through the FinSight AI Router.",
 };
