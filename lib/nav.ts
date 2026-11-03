@@ -63,4 +63,4 @@ export const NAV_GROUPS: NavGroup[] = [
 export const ALL_NAV_ITEMS: NavItem[] = NAV_GROUPS.flatMap((g) => g.items);
 
 /** Current FinSight application version, shared by Settings and the status API. */
-export const APP_VERSION = "0.3.0";
+export const APP_VERSION = "0.4.0";
