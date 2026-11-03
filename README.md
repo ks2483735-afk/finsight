@@ -54,8 +54,8 @@ FinSight prioritizes honest data and predictable provider behavior over pretendi
 | NewsAPI adapter | ✅ available; requires a NewsAPI key |
 | Google Gemini adapter | ⏳ Planned — not implemented |
 | AI answers / citations | ⏳ Planned — not implemented |
-| Earnings/events and SEC/MCA filings ingestion | ⏳ v0.5 |
-| Alert evaluation & notifications | ⏳ v0.7 |
+| Earnings/events and SEC/MCA filings ingestion | ⏳ v0.7 |
+| Alert evaluation & notifications | ⏳ v0.8 |
 
 ## Pinokio
 
