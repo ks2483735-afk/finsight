@@ -32,7 +32,7 @@ export const newsApiProvider: NewsProvider = {
     url.searchParams.set("category", categoryFor(query));
     url.searchParams.set("country", query.category === "India" ? "in" : "us");
 
-    const response = await fetchWithTimeout(url, { cache: "no-store" });
+    const response = await fetchWithTimeout(url, { cache: "no-store" }, 5000);
     if (!response.ok) throw new Error("NewsAPI HTTP " + response.status);
     const json = (await response.json()) as {
       status?: string;
