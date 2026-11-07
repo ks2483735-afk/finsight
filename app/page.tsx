@@ -94,11 +94,8 @@ export default function LandingPage() {
         <div
           className="pointer-events-none absolute inset-0 opacity-60"
           style={{
-            backgroundImage:
-              "linear-gradient(#161616 1px, transparent 1px), linear-gradient(90deg, #161616 1px, transparent 1px)",
-            backgroundSize: "44px 44px",
-            maskImage: "radial-gradient(ellipse 70% 60% at 50% 0%, #000 30%, transparent 100%)",
-            WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 0%, #000 30%, transparent 100%)",
+            background:
+              "radial-gradient(ellipse 72% 100% at 16% 0%, rgba(230, 176, 76, 0.08), transparent 100%)",
           }}
           aria-hidden
         />
@@ -147,22 +144,24 @@ export default function LandingPage() {
 
       {/* ------------------------------------------------------------ features */}
       <section className="mx-auto max-w-6xl px-5 py-16">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">
-          Built like a terminal, not a dashboard template
-        </h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((feature) => (
-            <div
-              key={feature.title}
-              className="rounded-lg border border-border bg-card p-5 transition-colors duration-150 hover:border-border-strong"
-            >
-              <span className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-elevated text-accent">
-                <feature.icon className="h-4 w-4" aria-hidden />
-              </span>
-              <h3 className="mt-3.5 text-sm font-semibold text-foreground">{feature.title}</h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-muted">{feature.body}</p>
-            </div>
-          ))}
+        <div className="grid gap-8 lg:grid-cols-[0.8fr_2fr] lg:gap-16">
+          <h2 className="max-w-sm text-xl font-semibold leading-snug tracking-tight text-foreground sm:text-2xl">
+            Built like a terminal, not a dashboard template
+          </h2>
+          <div className="grid gap-x-8 sm:grid-cols-2">
+            {FEATURES.map((feature) => (
+              <div
+                key={feature.title}
+                className="border-t border-border py-4 first:border-t-0 sm:first:border-t"
+              >
+                <div className="flex items-center gap-2.5">
+                  <feature.icon className="h-4 w-4 shrink-0 text-accent" aria-hidden />
+                  <h3 className="text-sm font-semibold text-foreground">{feature.title}</h3>
+                </div>
+                <p className="mt-2 max-w-[40ch] text-sm leading-relaxed text-muted">{feature.body}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
