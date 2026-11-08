@@ -4,6 +4,12 @@
 
 [![Latest Release](https://img.shields.io/github/v/release/ks2483735-afk/finsight?display_name=tag&sort=semver)](https://github.com/ks2483735-afk/finsight/releases) [![License](https://img.shields.io/github/license/ks2483735-afk/finsight)](https://github.com/ks2483735-afk/finsight/blob/main/LICENSE)
 
+## Product tour
+
+[![FinSight product tour](finsight-remotion/media/finsight-promo.gif)](finsight-remotion/media/finsight-promo.mp4)
+
+Click the animated preview to open the 24-second MP4.
+
 **Latest stable release:** [v0.3.0 — Performance & Reliability](https://github.com/ks2483735-afk/finsight/releases/tag/v0.3.0)
 
 **Next release candidate:** [v0.4.0 — Performance & Reliability](https://github.com/ks2483735-afk/finsight/pull/10)
