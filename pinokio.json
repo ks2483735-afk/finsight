@@ -1,10 +1,14 @@
 {
   "title": "FinSight",
-  "description": "Open-source finance research terminal with live market and news providers, clearly labeled demo fallbacks, and a local-first design.",
+  "description": "Open-source, local-first finance research for market data, company context, and news. Bring your own provider keys; demo fallback data stays clearly labeled.",
   "links": [
     {
       "title": "FinSight",
       "links": [
+        {
+          "title": "Web preview",
+          "value": "https://finsight-psi-gold.vercel.app"
+        },
         {
           "title": "GitHub",
           "value": "https://github.com/ks2483735-afk/finsight"

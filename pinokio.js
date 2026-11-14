@@ -1,7 +1,7 @@
 module.exports = {
   version: "7.0",
   title: "FinSight",
-  description: "Open-source finance research terminal with live market/news providers and clearly labeled demo fallbacks.",
+  description: "Open-source, local-first finance research for market data, company context, and news. Bring your own provider keys; demo fallback data stays clearly labeled.",
   menu: async (kernel, info) => {
     const installed = info.exists("node_modules");
     const running = {
@@ -10,6 +10,15 @@ module.exports = {
       update: info.running("update.js"),
       reset: info.running("reset.js")
     };
+    const links = [{
+      icon: "fa-solid fa-arrow-up-right-from-square",
+      text: "Web preview",
+      href: "https://finsight-psi-gold.vercel.app"
+    }, {
+      icon: "fa-brands fa-github",
+      text: "Repository",
+      href: "https://github.com/ks2483735-afk/finsight"
+    }];
 
     if (running.install) {
       return [{
@@ -17,7 +26,7 @@ module.exports = {
         icon: "fa-solid fa-plug",
         text: "Installing",
         href: "install.js"
-      }];
+      }, ...links];
     }
 
     if (installed) {
@@ -33,7 +42,7 @@ module.exports = {
             icon: "fa-solid fa-terminal",
             text: "Terminal",
             href: "start.js"
-          }];
+          }, ...links];
         }
       }
 
@@ -54,11 +63,7 @@ module.exports = {
         icon: "fa-regular fa-circle-xmark",
         text: "Reset",
         href: "reset.js"
-      }, {
-        icon: "fa-brands fa-github",
-        text: "Repository",
-        href: "https://github.com/ks2483735-afk/finsight"
-      }];
+      }, ...links];
     }
 
     if (running.update) {
@@ -67,7 +72,7 @@ module.exports = {
         icon: "fa-solid fa-terminal",
         text: "Updating",
         href: "update.js"
-      }];
+      }, ...links];
     }
 
     if (running.reset) {
@@ -76,7 +81,7 @@ module.exports = {
         icon: "fa-solid fa-terminal",
         text: "Resetting",
         href: "reset.js"
-      }];
+      }, ...links];
     }
 
     return [{
@@ -84,10 +89,6 @@ module.exports = {
       icon: "fa-solid fa-plug",
       text: "Install",
       href: "install.js"
-    }, {
-      icon: "fa-brands fa-github",
-      text: "Repository",
-      href: "https://github.com/ks2483735-afk/finsight"
-    }];
+    }, ...links];
   }
 };
